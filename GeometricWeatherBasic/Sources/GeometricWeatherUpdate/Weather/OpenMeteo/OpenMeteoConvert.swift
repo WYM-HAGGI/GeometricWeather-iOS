@@ -191,7 +191,7 @@ enum OpenMeteoConvert {
                 airQuality: currentAirQuality ?? emptyAirQuality(),
                 relativeHumidity: current.relativeHumidity2m,
                 pressure: current.pressureMsl ?? current.surfacePressure,
-                visibility: forecast.hourly?.visibility?.compactMap { $0 }.first,
+                visibility: forecast.hourly?.visibility?.compactMap { visibilityInKilometers($0) }.first,
                 dewPoint: nil,
                 cloudCover: current.cloudCover,
                 ceiling: nil,
@@ -242,7 +242,7 @@ enum OpenMeteoConvert {
                     ),
                     cloudrate: (hourly?.cloudCover?.get(index) ?? nil).map { $0 / 100.0 },
                     pressure: hourly?.pressureMsl?.get(index) ?? hourly?.surfacePressure?.get(index) ?? nil,
-                    visibility: hourly?.visibility?.get(index) ?? nil,
+                    visibility: visibilityInKilometers(hourly?.visibility?.get(index) ?? nil),
                     airQuality: airQuality,
                     humidity: hourly?.relativeHumidity2m?.get(index) ?? nil
                 )
@@ -499,6 +499,12 @@ enum OpenMeteoConvert {
     
     private static func roundedOptionalInt(_ value: Double?) -> Int? {
         return value.map { Int($0.rounded()) }
+    }
+    
+    private static func visibilityInKilometers(_ meters: Double?) -> Double? {
+        // Open-Meteo visibility is returned in meters. The app's DistanceUnit
+        // uses kilometers as its default model unit before formatting.
+        return meters.map { $0 / 1000.0 }
     }
     
     private static func average(_ values: [Double]) -> Double? {

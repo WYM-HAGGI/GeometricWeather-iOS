@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 55;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -1139,15 +1139,15 @@
 		37C4DFBB27D21D4200430086 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3771D83F28226F4500AEB8C1 /* Alamofire */,
-				37C6AE3B27D5F3FB00E88738 /* JXMovableCellTableView */,
-				3771D84128226F4500AEB8C1 /* Moya */,
-				37D3B8B727D6D61700191C2A /* NeedleFoundation */,
-				37C4E16A27D21D4200430086 /* Pods-GeometricWeather */,
-				3771D84328226F4500AEB8C1 /* ReactiveSwift */,
-				3771D84528226F4500AEB8C1 /* RxSwift */,
-				37C4E17227D21D4200430086 /* SnapKit */,
-				37C4E17427D21D4200430086 /* UICountingLabel */,
+				3771D83F28226F4500AEB8C1 /* Alamofire.framework */,
+				37C6AE3B27D5F3FB00E88738 /* JXMovableCellTableView.framework */,
+				3771D84128226F4500AEB8C1 /* Moya.framework */,
+				37D3B8B727D6D61700191C2A /* NeedleFoundation.framework */,
+				37C4E16A27D21D4200430086 /* Pods_GeometricWeather.framework */,
+				3771D84328226F4500AEB8C1 /* ReactiveSwift.framework */,
+				3771D84528226F4500AEB8C1 /* RxSwift.framework */,
+				37C4E17227D21D4200430086 /* SnapKit.framework */,
+				37C4E17427D21D4200430086 /* UICountingLabel.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1488,74 +1488,65 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		3771D83F28226F4500AEB8C1 /* Alamofire */ = {
+		3771D83F28226F4500AEB8C1 /* Alamofire.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = Alamofire;
 			path = Alamofire.framework;
 			remoteRef = 3771D83E28226F4500AEB8C1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3771D84128226F4500AEB8C1 /* Moya */ = {
+		3771D84128226F4500AEB8C1 /* Moya.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = Moya;
 			path = Moya.framework;
 			remoteRef = 3771D84028226F4500AEB8C1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3771D84328226F4500AEB8C1 /* ReactiveSwift */ = {
+		3771D84328226F4500AEB8C1 /* ReactiveSwift.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = ReactiveSwift;
 			path = ReactiveSwift.framework;
 			remoteRef = 3771D84228226F4500AEB8C1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3771D84528226F4500AEB8C1 /* RxSwift */ = {
+		3771D84528226F4500AEB8C1 /* RxSwift.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = RxSwift;
 			path = RxSwift.framework;
 			remoteRef = 3771D84428226F4500AEB8C1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		37C4E16A27D21D4200430086 /* Pods-GeometricWeather */ = {
+		37C4E16A27D21D4200430086 /* Pods_GeometricWeather.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = "Pods-GeometricWeather";
 			path = Pods_GeometricWeather.framework;
 			remoteRef = 37C4E16927D21D4200430086 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		37C4E17227D21D4200430086 /* SnapKit */ = {
+		37C4E17227D21D4200430086 /* SnapKit.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = SnapKit;
 			path = SnapKit.framework;
 			remoteRef = 37C4E17127D21D4200430086 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		37C4E17427D21D4200430086 /* UICountingLabel */ = {
+		37C4E17427D21D4200430086 /* UICountingLabel.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = UICountingLabel;
 			path = UICountingLabel.framework;
 			remoteRef = 37C4E17327D21D4200430086 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		37C6AE3B27D5F3FB00E88738 /* JXMovableCellTableView */ = {
+		37C6AE3B27D5F3FB00E88738 /* JXMovableCellTableView.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = JXMovableCellTableView;
 			path = JXMovableCellTableView.framework;
 			remoteRef = 37C6AE3A27D5F3FB00E88738 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		37D3B8B727D6D61700191C2A /* NeedleFoundation */ = {
+		37D3B8B727D6D61700191C2A /* NeedleFoundation.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = NeedleFoundation;
 			path = NeedleFoundation.framework;
 			remoteRef = 37D3B8B627D6D61700191C2A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -1618,9 +1609,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GeometricWeather/Pods-GeometricWeather-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GeometricWeather/Pods-GeometricWeather-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1989,7 +1984,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
 				DEVELOPMENT_ASSET_PATHS = "\"GeometricWeather/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 39G3694334;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = GeometricWeather/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -2029,7 +2024,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
 				DEVELOPMENT_ASSET_PATHS = "\"GeometricWeather/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 39G3694334;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = GeometricWeather/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -2063,7 +2058,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 39G3694334;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherWidgets;
@@ -2094,7 +2089,7 @@
 				CODE_SIGN_ENTITLEMENTS = GeometricWeatherWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 39G3694334;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherWidgets;
@@ -2127,7 +2122,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 39G3694334;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherLiveActivity/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherLiveActivity;
@@ -2160,7 +2155,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 39G3694334;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherLiveActivity/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherLiveActivity;

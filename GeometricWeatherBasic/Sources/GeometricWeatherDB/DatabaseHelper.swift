@@ -12,11 +12,18 @@ import GeometricWeatherResources
 
 extension URL {
 
-    static let storeURL = FileManager.default.containerURL(
-        forSecurityApplicationGroupIdentifier: "group.wangdaye.com.GeometricWeather"
-    )!.appendingPathComponent(
-        "GeometricWeather.sqlite"
-    )
+    static let storeURL: URL = {
+        let fileManager = FileManager.default
+        let baseURL = fileManager.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.com.haggi.geometricweather.test"
+        ) ?? fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        
+        try? fileManager.createDirectory(
+            at: baseURL,
+            withIntermediateDirectories: true
+        )
+        return baseURL.appendingPathComponent("GeometricWeather.sqlite")
+    }()
 }
 
 // MARK: - helper.

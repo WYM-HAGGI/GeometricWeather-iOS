@@ -149,25 +149,79 @@ public func getLocalizedText(_ key: String) -> String {
 }
 
 public func getLocationText(location: Location) -> String {
-    var text = ""
+    let city = cleanLocationPart(location.city)
+    let district = cleanLocationPart(location.district)
+    let province = cleanLocationPart(location.province)
     
-    if !location.district.isEmpty {
-        text = location.district
-    } else if !location.city.isEmpty {
-        text = location.city
-    } else if !location.province.isEmpty {
-        text = location.province
-    } else if location.currentPosition {
-        text = getLocalizedText("current_location")
+    if let city = city, let district = district, city != district {
+        return joinLocationParts([city, district], compact: shouldCompactLocationText(location))
+    }
+    if let city = city {
+        return city
+    }
+    if let province = province, let city = city, province != city {
+        return joinLocationParts([province, city], compact: shouldCompactLocationText(location))
+    }
+    if let province = province {
+        return province
+    }
+    if location.currentPosition {
+        return getLocalizedText("current_location")
+    }
+    return cleanLocationPart(location.country) ?? getLocalizedText("current_location")
+}
+
+public func getLocationDetailText(location: Location) -> String? {
+    let country = cleanLocationPart(location.country)
+    let province = cleanLocationPart(location.province)
+    let city = cleanLocationPart(location.city)
+    let district = cleanLocationPart(location.district)
+    let compact = shouldCompactLocationText(location)
+    
+    if province != nil || city != nil || district != nil {
+        return joinLocationParts(
+            [province, city, district],
+            compact: compact
+        )
+    }
+    if country != nil || city != nil {
+        return joinLocationParts(
+            [country, city],
+            compact: compact
+        )
+    }
+    return nil
+}
+
+private func cleanLocationPart(_ text: String?) -> String? {
+    guard var text = text?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else {
+        return nil
     }
     
-    if !text.hasSuffix(")") {
-        return text
+    if text.hasSuffix(")"), let deleteBegin = text.lastIndex(of: "(") {
+        text = String(text[..<deleteBegin])
     }
-    guard let deleteBegin = text.lastIndex(of: "(") else {
-        return text
+    if text == getLocalizedText("current_location") {
+        return nil
     }
-    return String(text[..<deleteBegin])
+    return text.isEmpty ? nil : text
+}
+
+private func joinLocationParts(_ parts: [String?], compact: Bool) -> String {
+    var result = [String]()
+    for part in parts {
+        guard let part = part, !result.contains(part) else {
+            continue
+        }
+        result.append(part)
+    }
+    return result.joined(separator: compact ? "" : ", ")
+}
+
+private func shouldCompactLocationText(_ location: Location) -> Bool {
+    return [location.country, location.province, location.city, location.district].contains { text in
+        text.range(of: "\\p{Han}", options: .regularExpression) != nil
+    }
 }
 
 public func getWeekText(_ daily: Daily) -> String {

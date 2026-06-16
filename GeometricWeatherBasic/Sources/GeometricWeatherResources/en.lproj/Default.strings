@@ -12,6 +12,8 @@
 "GeometricWeather" = "Geometric Weather";
 
 "current_location" = "Current location";
+"current_location_prefix" = "Current location: ";
+"data_location_prefix" = "Data location: ";
 "resident_location" = "Resident location";
 "default_location" = "default location";
 "live" = "Live";

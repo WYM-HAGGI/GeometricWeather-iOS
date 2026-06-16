@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreLocation
 import GeometricWeatherCore
 import GeometricWeatherResources
 
@@ -68,6 +69,63 @@ enum OpenMeteoConvert {
             weatherSource: .openMeteo,
             currentPosition: target.currentPosition,
             residentPosition: target.residentPosition
+        )
+    }
+    
+    static func generateLocationByCoordinate(
+        target: Location,
+        placemark: CLPlacemark
+    ) -> Location {
+        return Location(
+            cityId: target.usable ? target.cityId : stableCityId(
+                latitude: target.latitude,
+                longitude: target.longitude
+            ),
+            latitude: target.latitude,
+            longitude: target.longitude,
+            timezone: placemark.timeZone ?? target.timezone,
+            country: nonEmpty(placemark.country) ?? target.country,
+            province: nonEmpty(placemark.administrativeArea) ?? target.province,
+            city: nonEmpty(placemark.locality)
+                ?? nonEmpty(placemark.subAdministrativeArea)
+                ?? nonEmpty(target.city)
+                ?? getLocalizedText("current_location"),
+            district: nonEmpty(placemark.subLocality) ?? target.district,
+            weather: target.weather,
+            weatherSource: .openMeteo,
+            currentPosition: target.currentPosition,
+            residentPosition: target.residentPosition
+        )
+    }
+    
+    static func generateLocation(
+        from placemark: CLPlacemark,
+        src: Location? = nil
+    ) -> Location? {
+        guard let coordinate = placemark.location?.coordinate else {
+            return nil
+        }
+        
+        let fallbackName = nonEmpty(placemark.name)
+            ?? fallbackLocationName(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        return Location(
+            cityId: stableCityId(
+                latitude: coordinate.latitude,
+                longitude: coordinate.longitude
+            ),
+            latitude: coordinate.latitude,
+            longitude: coordinate.longitude,
+            timezone: placemark.timeZone ?? TimeZone.current,
+            country: nonEmpty(placemark.country) ?? "",
+            province: nonEmpty(placemark.administrativeArea) ?? "",
+            city: nonEmpty(placemark.locality)
+                ?? nonEmpty(placemark.subAdministrativeArea)
+                ?? fallbackName,
+            district: nonEmpty(placemark.subLocality) ?? "",
+            weather: src?.weather,
+            weatherSource: .openMeteo,
+            currentPosition: src?.currentPosition ?? false,
+            residentPosition: src?.residentPosition ?? false
         )
     }
     

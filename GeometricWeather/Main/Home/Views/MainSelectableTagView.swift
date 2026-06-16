@@ -131,14 +131,16 @@ class MainSelectableTagView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
-        let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: reuseId,
-            for: indexPath
-        ) as! TagCell
-        
-        cell.bindData(title: self.tagList.get(indexPath.row) ?? "", delegate: self)
-        
-        return cell.systemLayoutSizeFitting(.zero)
+        let title = self.tagList.get(indexPath.row) ?? ""
+        let font = UIFont.systemFont(
+            ofSize: miniCaptionFont.pointSize,
+            weight: .semibold
+        )
+        let textWidth = NSString(string: title).size(withAttributes: [.font: font]).width
+        return CGSize(
+            width: ceil(textWidth + 3 * littleMargin),
+            height: collectionView.bounds.height > 0 ? collectionView.bounds.height : navBarHeight
+        )
     }
     
     func getSelectedColor() -> UIColor {

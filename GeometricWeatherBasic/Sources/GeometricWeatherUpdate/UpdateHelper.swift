@@ -117,6 +117,9 @@ public class UpdateHelper {
     }
     
     private func getWeatherApi(_ weatherSource: WeatherSource) -> WeatherApi {
+        if weatherSource == .openMeteo {
+            return OpenMeteoApi()
+        }
         if weatherSource == .caiYun {
             return CaiYunApi()
         }

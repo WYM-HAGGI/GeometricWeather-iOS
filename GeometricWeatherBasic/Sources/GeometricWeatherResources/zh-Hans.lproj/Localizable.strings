@@ -333,16 +333,36 @@
 "settings_title_notification" = "开启天气通知";
 
 "weather_source_cn" = "weather.com.cn (仅中国有效)";
+"weather_source_openmeteo" = "Open-Meteo";
 "weather_source_caiyun" = "caiyunapp.com (仅中国有效)";
 "weather_source_accu" = "accuweather.com";
 "weather_source_owm" = "OpenWeather";
 "weather_source_mf" = "Météo France";
 
 "weather_source_voice_cn" = "weather.com.CN";
+"weather_source_voice_openmeteo" = "Open Meteo";
 "weather_source_voice_caiyun" = "CaiYun App.com";
 "weather_source_voice_accu" = "ACCU weather.com";
 "weather_source_voice_owm" = "Open Weather";
 "weather_source_voice_mf" = "Météo France";
+
+"openmeteo_weather_mainly_clear" = "主要晴朗";
+"openmeteo_weather_rime_fog" = "雾凇";
+"openmeteo_weather_drizzle_light" = "小毛毛雨";
+"openmeteo_weather_drizzle_moderate" = "中毛毛雨";
+"openmeteo_weather_drizzle_heavy" = "大毛毛雨";
+"openmeteo_weather_freezing_drizzle_light" = "小冻毛毛雨";
+"openmeteo_weather_freezing_drizzle_heavy" = "强冻毛毛雨";
+"openmeteo_weather_freezing_rain_light" = "小冻雨";
+"openmeteo_weather_freezing_rain_heavy" = "强冻雨";
+"openmeteo_weather_snow_grains" = "雪粒";
+"openmeteo_weather_rain_showers_light" = "小阵雨";
+"openmeteo_weather_rain_showers_moderate" = "中阵雨";
+"openmeteo_weather_rain_showers_heavy" = "强阵雨";
+"openmeteo_weather_snow_showers_light" = "小阵雪";
+"openmeteo_weather_snow_showers_heavy" = "强阵雪";
+"openmeteo_weather_thunderstorm_light_hail" = "雷暴伴小冰雹";
+"openmeteo_weather_thunderstorm_heavy_hail" = "雷暴伴大冰雹";
 
 "dark_mode_auto" = "自动";
 "dark_mode_system" = "跟随系统";

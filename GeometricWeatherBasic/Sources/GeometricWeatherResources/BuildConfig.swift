@@ -47,7 +47,7 @@ public protocol BuildConfigProtocal {
 private struct DebugConfig: BuildConfigProtocal {
     
     var defaultWeatherSourceId: String {
-        return "caiyun"
+        return "openmeteo"
     }
     
     var accuWeatherKey: String {
@@ -81,7 +81,7 @@ private struct DebugConfig: BuildConfigProtocal {
 private struct ReleaseConfig: BuildConfigProtocal {
     
     var defaultWeatherSourceId: String {
-        return "accu"
+        return "openmeteo"
     }
     
     var accuWeatherKey: String {

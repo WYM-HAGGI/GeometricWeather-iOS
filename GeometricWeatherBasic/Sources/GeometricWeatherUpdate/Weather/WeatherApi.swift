@@ -11,6 +11,9 @@ import RxSwift
 import GeometricWeatherCore
 
 public func getWeatherApi(_ weatherSource: WeatherSource) -> WeatherApi {
+    if weatherSource == .openMeteo {
+        return OpenMeteoApi()
+    }
     if weatherSource == .caiYun {
         return CaiYunApi()
     }

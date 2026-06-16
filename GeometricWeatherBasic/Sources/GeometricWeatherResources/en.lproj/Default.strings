@@ -339,16 +339,36 @@
 "settings_title_notification" = "Send Notification";
 
 "weather_source_cn" = "weather.com.cn (Only For China)";
+"weather_source_openmeteo" = "Open-Meteo";
 "weather_source_caiyun" = "caiyunapp.com (Only For China)";
 "weather_source_accu" = "accuweather.com";
 "weather_source_owm" = "OpenWeather";
 "weather_source_mf" = "Météo France";
 
 "weather_source_voice_cn" = "weather.com.CN";
+"weather_source_voice_openmeteo" = "Open Meteo";
 "weather_source_voice_caiyun" = "CaiYun App.com";
 "weather_source_voice_accu" = "ACCU weather.com";
 "weather_source_voice_owm" = "Open Weather";
 "weather_source_voice_mf" = "Météo France";
+
+"openmeteo_weather_mainly_clear" = "Mainly Clear";
+"openmeteo_weather_rime_fog" = "Rime Fog";
+"openmeteo_weather_drizzle_light" = "Light Drizzle";
+"openmeteo_weather_drizzle_moderate" = "Moderate Drizzle";
+"openmeteo_weather_drizzle_heavy" = "Heavy Drizzle";
+"openmeteo_weather_freezing_drizzle_light" = "Light Freezing Drizzle";
+"openmeteo_weather_freezing_drizzle_heavy" = "Heavy Freezing Drizzle";
+"openmeteo_weather_freezing_rain_light" = "Light Freezing Rain";
+"openmeteo_weather_freezing_rain_heavy" = "Heavy Freezing Rain";
+"openmeteo_weather_snow_grains" = "Snow Grains";
+"openmeteo_weather_rain_showers_light" = "Light Rain Showers";
+"openmeteo_weather_rain_showers_moderate" = "Moderate Rain Showers";
+"openmeteo_weather_rain_showers_heavy" = "Heavy Rain Showers";
+"openmeteo_weather_snow_showers_light" = "Light Snow Showers";
+"openmeteo_weather_snow_showers_heavy" = "Heavy Snow Showers";
+"openmeteo_weather_thunderstorm_light_hail" = "Thunderstorm with Light Hail";
+"openmeteo_weather_thunderstorm_heavy_hail" = "Thunderstorm with Heavy Hail";
 
 "dark_mode_auto" = "Automatic";
 "dark_mode_system" = "Follow system";

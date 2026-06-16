@@ -7,3 +7,4 @@
 */
 
 "CFBundleDisplayName" = "Geometric Weather";
+"NSMotionUsageDescription" = "This app needs access to motion and sensor data to read the device barometer and estimate the current altitude.";

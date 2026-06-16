@@ -17,6 +17,7 @@ class MainDetailsCardCell: MainTableViewCell {
     // MARK: - subviews.
     
     private let vstack = UIStackView(frame: .zero)
+    private var pressureTask: Task<Void, Never>?
     
     // MARK: - life cycle.
     
@@ -45,8 +46,17 @@ class MainDetailsCardCell: MainTableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        self.pressureTask?.cancel()
+        self.pressureTask = nil
+    }
+    
     override func bindData(location: Location, timeBar: MainTimeBarView?) {
         super.bindData(location: location, timeBar: timeBar)
+        self.pressureTask?.cancel()
+        self.pressureTask = nil
         
         guard let weather = location.weather else {
             return
@@ -120,18 +130,38 @@ class MainDetailsCardCell: MainTableViewCell {
         }
         
         // pressure.
-        if let pressure = weather.current.pressure {
-            let unit = SettingsManager.shared.pressureUnit
-            self.vstack.addArrangedSubview(
-                self.generateDetailItemView(
-                    iconName: "gauge",
-                    title: getLocalizedText("pressure"),
-                    body: unit.formatValueWithUnit(
-                        pressure,
-                        unit: getLocalizedText(unit.key)
-                    )
-                )
+        if let pressureValue = PressureDisplayValueProvider.fallback(
+            weatherPressureHpa: weather.current.pressure
+        ) {
+            let pressureItem = self.generateDetailItemView(
+                iconName: "gauge",
+                title: getLocalizedText("pressure"),
+                body: self.getPressureText(pressureValue)
             )
+            self.vstack.addArrangedSubview(
+                pressureItem
+            )
+            let locationId = location.formattedId
+            self.pressureTask = Task { [weak self, weak pressureItem] in
+                guard let pressureValue = await PressureDisplayValueProvider.current(
+                    weatherPressureHpa: weather.current.pressure
+                ) else {
+                    return
+                }
+                await MainActor.run {
+                    guard let self = self,
+                          let pressureItem = pressureItem,
+                          !Task.isCancelled,
+                          locationId == location.formattedId else {
+                        return
+                    }
+                    pressureItem.bindData(
+                        iconName: "gauge",
+                        title: getLocalizedText("pressure"),
+                        body: self.getPressureText(pressureValue)
+                    )
+                }
+            }
         }
         
         // visibility.
@@ -161,5 +191,37 @@ class MainDetailsCardCell: MainTableViewCell {
         view.bindData(iconName: iconName, title: title, body: body)
         return view
     }
+    
+    private func getPressureText(_ value: PressureDisplayValue) -> String {
+        let pressureText = String(
+            format: "%.1f hPa (%@)",
+            value.pressureHpa,
+            self.getPressureSourceText(value.pressureSource)
+        )
+        
+        guard let altitude = value.calibratedAltitudeMeters else {
+            return pressureText
+        }
+        
+        switch value.altitudeSource {
+        case .barometricCalibrated:
+            return pressureText + " | " + String(format: getLocalizedText("altitude_approx_format"), altitude)
+            
+        case .weatherElevation:
+            return pressureText + " | " + String(format: getLocalizedText("altitude_format"), altitude)
+            
+        case .unavailable:
+            return pressureText
+        }
+    }
+    
+    private func getPressureSourceText(_ source: PressureSource) -> String {
+        switch source {
+        case .device:
+            return getLocalizedText("pressure_source_device")
+            
+        case .weather:
+            return getLocalizedText("pressure_source_weather")
+        }
+    }
 }
-

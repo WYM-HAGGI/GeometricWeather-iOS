@@ -48,6 +48,12 @@
 "follow_system" = "Follow system";
 "background_information" = "Background information";
 "pressure" = "Atmospheric pressure";
+"altitude" = "Altitude";
+"approximate" = "about";
+"altitude_format" = "Altitude %.0f m";
+"altitude_approx_format" = "Altitude about %.0f m";
+"pressure_source_device" = "device";
+"pressure_source_weather" = "weather source";
 "visibility" = "Visibility";
 "dew_point" = "Dew point";
 "cloud_cover" = "Cloud cover";

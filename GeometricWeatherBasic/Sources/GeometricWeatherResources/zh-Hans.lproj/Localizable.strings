@@ -45,6 +45,12 @@
 "follow_system" = "跟随系统";
 "background_information" = "后台信息";
 "pressure" = "大气压强";
+"altitude" = "海拔";
+"approximate" = "约";
+"altitude_format" = "海拔 %.0f m";
+"altitude_approx_format" = "海拔约 %.0f m";
+"pressure_source_device" = "设备";
+"pressure_source_weather" = "天气源";
 "visibility" = "能见度";
 "dew_point" = "露点";
 "cloud_cover" = "云量";

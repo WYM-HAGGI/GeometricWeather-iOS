@@ -7,3 +7,4 @@
 */
 
 "CFBundleDisplayName" = "几何天气";
+"NSMotionUsageDescription" = "需要访问运动与传感器数据，用于读取设备气压计并估算当前海拔。";

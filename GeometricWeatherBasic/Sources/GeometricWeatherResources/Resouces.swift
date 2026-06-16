@@ -130,6 +130,8 @@ public extension Bundle {
 
 // MARK: - text.
 
+private let locationDetailTextUserDefaultsPrefix = "location_detail_text_"
+
 public func getLocalizedText(_ key: String) -> String {
     let defaultValue = NSLocalizedString(
         key,
@@ -146,6 +148,17 @@ public func getLocalizedText(_ key: String) -> String {
         value: defaultValue,
         comment: ""
     )
+}
+
+public func locationHasResolvedAddress(_ location: Location) -> Bool {
+    if getStoredLocationDetailText(location: location) != nil {
+        return true
+    }
+    
+    return cleanLocationPart(location.country) != nil
+        || cleanLocationPart(location.province) != nil
+        || cleanLocationPart(location.city) != nil
+        || cleanLocationPart(location.district) != nil
 }
 
 public func getLocationText(location: Location) -> String {
@@ -172,6 +185,10 @@ public func getLocationText(location: Location) -> String {
 }
 
 public func getLocationDetailText(location: Location) -> String? {
+    if let detail = getStoredLocationDetailText(location: location) {
+        return detail
+    }
+    
     let country = cleanLocationPart(location.country)
     let province = cleanLocationPart(location.province)
     let city = cleanLocationPart(location.city)
@@ -191,6 +208,25 @@ public func getLocationDetailText(location: Location) -> String? {
         )
     }
     return nil
+}
+
+public func saveLocationDetailText(location: Location, detail: String?) {
+    let key = locationDetailTextUserDefaultsPrefix + location.formattedId
+    guard let detail = detail?.trimmingCharacters(in: .whitespacesAndNewlines), !detail.isEmpty else {
+        UserDefaults.standard.removeObject(forKey: key)
+        return
+    }
+    
+    UserDefaults.standard.set(detail, forKey: key)
+}
+
+private func getStoredLocationDetailText(location: Location) -> String? {
+    let key = locationDetailTextUserDefaultsPrefix + location.formattedId
+    guard let text = UserDefaults.standard.string(forKey: key)?.trimmingCharacters(in: .whitespacesAndNewlines),
+          !text.isEmpty else {
+        return nil
+    }
+    return text
 }
 
 private func cleanLocationPart(_ text: String?) -> String? {

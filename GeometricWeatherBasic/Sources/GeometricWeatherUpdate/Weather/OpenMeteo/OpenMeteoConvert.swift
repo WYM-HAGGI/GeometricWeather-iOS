@@ -76,7 +76,7 @@ enum OpenMeteoConvert {
         target: Location,
         placemark: CLPlacemark
     ) -> Location {
-        return Location(
+        let location = Location(
             cityId: target.usable ? target.cityId : stableCityId(
                 latitude: target.latitude,
                 longitude: target.longitude
@@ -96,6 +96,11 @@ enum OpenMeteoConvert {
             currentPosition: target.currentPosition,
             residentPosition: target.residentPosition
         )
+        saveLocationDetailText(
+            location: location,
+            detail: generateDetailAddress(from: placemark)
+        )
+        return location
     }
     
     static func generateLocation(
@@ -108,7 +113,7 @@ enum OpenMeteoConvert {
         
         let fallbackName = nonEmpty(placemark.name)
             ?? fallbackLocationName(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        return Location(
+        let location = Location(
             cityId: stableCityId(
                 latitude: coordinate.latitude,
                 longitude: coordinate.longitude
@@ -127,6 +132,11 @@ enum OpenMeteoConvert {
             currentPosition: src?.currentPosition ?? false,
             residentPosition: src?.residentPosition ?? false
         )
+        saveLocationDetailText(
+            location: location,
+            detail: generateDetailAddress(from: placemark)
+        )
+        return location
     }
     
     static func generateWeather(
@@ -552,6 +562,67 @@ enum OpenMeteoConvert {
             return nil
         }
         return value
+    }
+    
+    private static func generateDetailAddress(from placemark: CLPlacemark) -> String? {
+        let compact = shouldCompactPlacemark(placemark)
+        var detail = joinUnique(
+            [
+                nonEmpty(placemark.administrativeArea),
+                nonEmpty(placemark.locality) ?? nonEmpty(placemark.subAdministrativeArea),
+                nonEmpty(placemark.subLocality),
+                nonEmpty(placemark.thoroughfare),
+                nonEmpty(placemark.subThoroughfare)
+            ],
+            compact: compact
+        )
+        
+        if detail.isEmpty {
+            detail = joinUnique(
+                [
+                    nonEmpty(placemark.country),
+                    nonEmpty(placemark.locality)
+                        ?? nonEmpty(placemark.subAdministrativeArea)
+                        ?? nonEmpty(placemark.name)
+                ],
+                compact: compact
+            )
+        }
+        
+        if detail.isEmpty {
+            return nil
+        }
+        if compact,
+           nonEmpty(placemark.thoroughfare) != nil,
+           nonEmpty(placemark.subThoroughfare) == nil,
+           !detail.hasSuffix(getLocalizedText("nearby_suffix")) {
+            detail += getLocalizedText("nearby_suffix")
+        }
+        return detail
+    }
+    
+    private static func joinUnique(_ parts: [String?], compact: Bool) -> String {
+        var result = [String]()
+        for part in parts {
+            guard let part = part, !result.contains(part) else {
+                continue
+            }
+            result.append(part)
+        }
+        return result.joined(separator: compact ? "" : ", ")
+    }
+    
+    private static func shouldCompactPlacemark(_ placemark: CLPlacemark) -> Bool {
+        return [
+            placemark.country,
+            placemark.administrativeArea,
+            placemark.locality,
+            placemark.subAdministrativeArea,
+            placemark.subLocality,
+            placemark.thoroughfare
+        ].contains { text in
+            text?.range(of: "\\p{Han}", options: .regularExpression) != nil
+        }
     }
     
     private static func stableCityId(latitude: Double, longitude: Double) -> String {

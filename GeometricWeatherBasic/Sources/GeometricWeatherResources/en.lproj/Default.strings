@@ -14,6 +14,7 @@
 "current_location" = "Current location";
 "current_location_prefix" = "Current location: ";
 "data_location_prefix" = "Data location: ";
+"nearby_suffix" = " nearby";
 "resident_location" = "Resident location";
 "default_location" = "default location";
 "live" = "Live";

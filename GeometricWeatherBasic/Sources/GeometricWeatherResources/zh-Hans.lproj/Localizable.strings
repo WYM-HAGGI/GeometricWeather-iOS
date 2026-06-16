@@ -11,6 +11,7 @@
 "current_location" = "当前位置";
 "current_location_prefix" = "当前定位：";
 "data_location_prefix" = "数据位置：";
+"nearby_suffix" = "附近";
 "resident_location" = "常驻位置";
 "default_location" = "默认位置";
 "live" = "实时";

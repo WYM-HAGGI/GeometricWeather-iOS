@@ -44,6 +44,7 @@
 		3759512B2977D9AC002F6B22 /* LiveActivityHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759512A2977D9AC002F6B22 /* LiveActivityHelper.swift */; };
 		3759513B2977F001002F6B22 /* LiveActivityWeatherEligibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759513A2977F001002F6B22 /* LiveActivityWeatherEligibility.swift */; };
 		3759513D2977F002002F6B22 /* WeatherAlertProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759513C2977F002002F6B22 /* WeatherAlertProvider.swift */; };
+		3759513F2977F003002F6B22 /* AirQualityProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759513E2977F003002F6B22 /* AirQualityProvider.swift */; };
 		3759512F2977E84B002F6B22 /* PrecipitationActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759512D2977E670002F6B22 /* PrecipitationActivityWidget.swift */; };
 		375951332977E988002F6B22 /* PrecipitationActivityNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375951322977E988002F6B22 /* PrecipitationActivityNotificationView.swift */; };
 		375951362977ECA9002F6B22 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375951352977ECA9002F6B22 /* Constants.swift */; };
@@ -323,6 +324,7 @@
 		3759512A2977D9AC002F6B22 /* LiveActivityHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityHelper.swift; sourceTree = "<group>"; };
 		3759513A2977F001002F6B22 /* LiveActivityWeatherEligibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityWeatherEligibility.swift; sourceTree = "<group>"; };
 		3759513C2977F002002F6B22 /* WeatherAlertProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAlertProvider.swift; sourceTree = "<group>"; };
+		3759513E2977F003002F6B22 /* AirQualityProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirQualityProvider.swift; sourceTree = "<group>"; };
 		3759512D2977E670002F6B22 /* PrecipitationActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrecipitationActivityWidget.swift; sourceTree = "<group>"; };
 		375951322977E988002F6B22 /* PrecipitationActivityNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrecipitationActivityNotificationView.swift; sourceTree = "<group>"; };
 		375951352977ECA9002F6B22 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -1066,6 +1068,7 @@
 				3759512A2977D9AC002F6B22 /* LiveActivityHelper.swift */,
 				3759513A2977F001002F6B22 /* LiveActivityWeatherEligibility.swift */,
 				3759513C2977F002002F6B22 /* WeatherAlertProvider.swift */,
+				3759513E2977F003002F6B22 /* AirQualityProvider.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -1781,6 +1784,7 @@
 				3759512B2977D9AC002F6B22 /* LiveActivityHelper.swift in Sources */,
 				3759513B2977F001002F6B22 /* LiveActivityWeatherEligibility.swift in Sources */,
 				3759513D2977F002002F6B22 /* WeatherAlertProvider.swift in Sources */,
+				3759513F2977F003002F6B22 /* AirQualityProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

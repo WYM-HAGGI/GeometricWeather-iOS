@@ -28,7 +28,6 @@ struct LiveActivityWeatherEligibility {
         static let precipitationMmPerHour = 0.3
         static let lookaheadMinutes = 60
         static let hourlyLookaheadHours = 2
-        static let alertMaxAge: TimeInterval = 24 * 60 * 60
     }
     
     static func reason(for location: Location) -> LiveActivityReason? {
@@ -50,6 +49,29 @@ struct LiveActivityWeatherEligibility {
         return nil
     }
     
+    static func reason(
+        for location: Location,
+        alertProvider: WeatherAlertProvider?
+    ) async -> LiveActivityReason? {
+        if let reason = reason(for: location) {
+            return reason
+        }
+        guard let alertProvider = alertProvider else {
+            return nil
+        }
+        
+        do {
+            let alerts = try await alertProvider.fetchAlerts(for: location)
+            return hasValidAlert(alerts) ? .alert : nil
+        } catch {
+            printLog(
+                keyword: "liveActivity",
+                content: "Fallback alert provider \(alertProvider.providerName) failed: \(error.localizedDescription)"
+            )
+            return nil
+        }
+    }
+    
     static func fallbackMinutely(for location: Location) -> Minutely {
         let beginTime = Date().timeIntervalSince1970
         return Minutely(
@@ -60,11 +82,8 @@ struct LiveActivityWeatherEligibility {
     }
     
     private static func hasValidAlert(_ alerts: [WeatherAlert]) -> Bool {
-        let now = Date().timeIntervalSince1970
         return alerts.contains { alert in
-            // WeatherAlert currently has no expiration timestamp. Treat recent alerts as active
-            // until source-specific alert expiry is added by a future WeatherAlertProvider.
-            alert.time >= now - Threshold.alertMaxAge
+            WeatherAlertValidation.isLiveActivityEligible(alert)
         }
     }
     

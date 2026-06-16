@@ -44,7 +44,10 @@ private func updateLiveActivity(for location: Location) async throws {
         if !SettingsManager.shared.dynamicIslandEnabled {
             return
         }
-        guard let reason = LiveActivityWeatherEligibility.reason(for: location) else {
+        guard let reason = await LiveActivityWeatherEligibility.reason(
+            for: location,
+            alertProvider: WeatherAlertProviderBridge.fallbackProvider
+        ) else {
             printLog(
                 keyword: "liveActivity",
                 content: "Ended live activity and skipped request because no eligible weather event exists for \(location.formattedId)"

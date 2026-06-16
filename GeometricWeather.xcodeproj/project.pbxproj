@@ -1467,6 +1467,9 @@
 				Base,
 			);
 			mainGroup = 370BA58B269C398D006BB1CE;
+			packageReferences = (
+				37F2A0002C20B00100F1A001 /* XCLocalSwiftPackageReference "GeometricWeatherBasic" */,
+			);
 			productRefGroup = 370BA595269C398D006BB1CE /* Products */;
 			projectDirPath = "";
 			projectReferences = (
@@ -1605,7 +1608,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export SOURCEKIT_LOGGING=0 && needle generate $SRCROOT/$TARGETNAME/NeedleGenerated.swift $SRCROOT/$TARGETNAME\n";
+			shellScript = "export SOURCEKIT_LOGGING=0\nif command -v needle >/dev/null 2>&1; then\n  needle generate \"$SRCROOT/$TARGETNAME/NeedleGenerated.swift\" \"$SRCROOT/$TARGETNAME\"\nelse\n  echo \"warning: needle CLI not found; using checked-in NeedleGenerated.swift\"\nfi\n";
 		};
 		3B7D60976E16AA5E2EAC2EC2 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1986,17 +1989,17 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
 				DEVELOPMENT_ASSET_PATHS = "\"GeometricWeather/Preview Content\"";
-				DEVELOPMENT_TEAM = 73CBTMT92C;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = GeometricWeather/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.2;
 				MARKETING_VERSION = 1.7.89;
-				PRODUCT_BUNDLE_IDENTIFIER = wangdaye.com.GeometricWeather;
+				PRODUCT_BUNDLE_IDENTIFIER = com.haggi.geometricweather.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
@@ -2026,17 +2029,17 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
 				DEVELOPMENT_ASSET_PATHS = "\"GeometricWeather/Preview Content\"";
-				DEVELOPMENT_TEAM = 73CBTMT92C;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = GeometricWeather/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.2;
 				MARKETING_VERSION = 1.7.89;
-				PRODUCT_BUNDLE_IDENTIFIER = wangdaye.com.GeometricWeather;
+				PRODUCT_BUNDLE_IDENTIFIER = com.haggi.geometricweather.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
@@ -2060,19 +2063,19 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = 73CBTMT92C;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherWidgets;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.7.89;
-				PRODUCT_BUNDLE_IDENTIFIER = wangdaye.com.GeometricWeather.GeometricWeatherWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.haggi.geometricweather.test.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = YES;
@@ -2091,19 +2094,19 @@
 				CODE_SIGN_ENTITLEMENTS = GeometricWeatherWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = 73CBTMT92C;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherWidgets;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.7.89;
-				PRODUCT_BUNDLE_IDENTIFIER = wangdaye.com.GeometricWeather.GeometricWeatherWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.haggi.geometricweather.test.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = YES;
@@ -2124,7 +2127,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = 73CBTMT92C;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherLiveActivity/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherLiveActivity;
@@ -2136,7 +2139,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.7.89;
-				PRODUCT_BUNDLE_IDENTIFIER = wangdaye.com.GeometricWeather.GeometricWeatherLiveActivity;
+				PRODUCT_BUNDLE_IDENTIFIER = com.haggi.geometricweather.test.liveactivity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = YES;
@@ -2157,7 +2160,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = 73CBTMT92C;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherLiveActivity/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherLiveActivity;
@@ -2169,7 +2172,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.7.89;
-				PRODUCT_BUNDLE_IDENTIFIER = wangdaye.com.GeometricWeather.GeometricWeatherLiveActivity;
+				PRODUCT_BUNDLE_IDENTIFIER = com.haggi.geometricweather.test.liveactivity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = YES;
@@ -2220,17 +2223,27 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		37F2A0002C20B00100F1A001 /* XCLocalSwiftPackageReference "GeometricWeatherBasic" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = GeometricWeatherBasic;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		3759512829743681002F6B22 /* GeometricWeatherBasic */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 37F2A0002C20B00100F1A001 /* XCLocalSwiftPackageReference "GeometricWeatherBasic" */;
 			productName = GeometricWeatherBasic;
 		};
 		3771D8792822A28400AEB8C1 /* GeometricWeatherBasic */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 37F2A0002C20B00100F1A001 /* XCLocalSwiftPackageReference "GeometricWeatherBasic" */;
 			productName = GeometricWeatherBasic;
 		};
 		3771D87B2822A29000AEB8C1 /* GeometricWeatherBasic */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 37F2A0002C20B00100F1A001 /* XCLocalSwiftPackageReference "GeometricWeatherBasic" */;
 			productName = GeometricWeatherBasic;
 		};
 /* End XCSwiftPackageProductDependency section */

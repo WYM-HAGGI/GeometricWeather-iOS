@@ -97,6 +97,7 @@
 		379A8B3527C8C59000083BFF /* HomeViewController+Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A6F27C8C59000083BFF /* HomeViewController+Layout.swift */; };
 		379A8B3627C8C59000083BFF /* HomeViewController+PageIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A7027C8C59000083BFF /* HomeViewController+PageIndicator.swift */; };
 		379A8B3727C8C59000083BFF /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A7127C8C59000083BFF /* HomeViewController.swift */; };
+		379A8B3727C8C59000083B00 /* MainHomeLayoutMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A7127C8C59000083B00 /* MainHomeLayoutMetrics.swift */; };
 		379A8B3827C8C59000083BFF /* MainDetailItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A7327C8C59000083BFF /* MainDetailItemView.swift */; };
 		379A8B3927C8C59000083BFF /* MainSelectableTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A7427C8C59000083BFF /* MainSelectableTagView.swift */; };
 		379A8B3A27C8C59000083BFF /* MainTimeBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A7527C8C59000083BFF /* MainTimeBarView.swift */; };
@@ -396,6 +397,7 @@
 		379A8A6F27C8C59000083BFF /* HomeViewController+Layout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "HomeViewController+Layout.swift"; sourceTree = "<group>"; };
 		379A8A7027C8C59000083BFF /* HomeViewController+PageIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "HomeViewController+PageIndicator.swift"; sourceTree = "<group>"; };
 		379A8A7127C8C59000083BFF /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		379A8A7127C8C59000083B00 /* MainHomeLayoutMetrics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainHomeLayoutMetrics.swift; sourceTree = "<group>"; };
 		379A8A7327C8C59000083BFF /* MainDetailItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainDetailItemView.swift; sourceTree = "<group>"; };
 		379A8A7427C8C59000083BFF /* MainSelectableTagView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainSelectableTagView.swift; sourceTree = "<group>"; };
 		379A8A7527C8C59000083BFF /* MainTimeBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTimeBarView.swift; sourceTree = "<group>"; };
@@ -883,6 +885,7 @@
 				379A8A7227C8C59000083BFF /* Views */,
 				37462A0E2823A13E009FBB85 /* Controllers */,
 				379A8A5927C8C59000083BFF /* Cells */,
+				379A8A7127C8C59000083B00 /* MainHomeLayoutMetrics.swift */,
 				379A8A7127C8C59000083BFF /* HomeViewController.swift */,
 				379A8A6F27C8C59000083BFF /* HomeViewController+Layout.swift */,
 				379A8A6E27C8C59000083BFF /* HomeViewController+UITableView.swift */,
@@ -1733,6 +1736,7 @@
 				379A8B3327C8C59000083B00 /* MainCardLayoutMetrics.swift in Sources */,
 				379A8B3E27C8C59000083BFF /* MainViewController.swift in Sources */,
 				379A8B3227C8C59000083BFF /* MainTableViewCell.swift in Sources */,
+				379A8B3727C8C59000083B00 /* MainHomeLayoutMetrics.swift in Sources */,
 				379A8B3727C8C59000083BFF /* HomeViewController.swift in Sources */,
 				379A8B3527C8C59000083BFF /* HomeViewController+Layout.swift in Sources */,
 				374629F52823996B009FBB85 /* UILabelExt.swift in Sources */,

@@ -66,7 +66,12 @@ class SearchTableViewCell: UITableViewCell {
             }
         }
         
-        self.emptyLocationView.bindData(location: location)
+        let searchDisplayText = getLocationSearchDisplayText(location: location)
+        self.emptyLocationView.bindData(
+            location: location,
+            title: searchDisplayText?.title,
+            subtitle: searchDisplayText?.subtitle
+        )
     }
     
     // MARK: - selection.

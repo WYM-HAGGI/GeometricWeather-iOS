@@ -76,20 +76,7 @@ struct LocationSearchResult {
     }
     
     var displaySubtitle: String {
-        [
-            nonEmpty(admin4),
-            nonEmpty(admin3),
-            nonEmpty(admin2),
-            nonEmpty(admin1),
-            nonEmpty(country)
-        ]
-            .compactMap { $0 }
-            .reduce(into: [String]()) { result, item in
-                if !result.contains(item) {
-                    result.append(item)
-                }
-            }
-            .joined(separator: " ")
+        Self.joinDisplayParts(administrativeParts)
     }
     
     var searchableText: String {
@@ -116,13 +103,11 @@ struct LocationSearchResult {
             return nil
         }
         
-        let city = nonEmpty(localizedName)
-        ?? nonEmpty(name)
-        ?? Self.coordinateTitle(latitude: latitude, longitude: longitude)
-        let province = nonEmpty(admin1) ?? nonEmpty(admin2) ?? ""
-        let district = nonEmpty(admin4) ?? nonEmpty(admin3) ?? ""
+        let city = administrativeCity
+        let province = nonEmpty(admin1) ?? ""
+        let district = administrativeDistrict
         
-        return Location(
+        let location = Location(
             cityId: sourceId ?? OpenMeteoConvert.stableCityId(
                 latitude: latitude,
                 longitude: longitude
@@ -139,6 +124,17 @@ struct LocationSearchResult {
             currentPosition: false,
             residentPosition: false
         )
+        
+        saveLocationDetailText(
+            location: location,
+            detail: Self.joinDisplayParts(administrativeParts)
+        )
+        saveLocationSearchDisplayText(
+            location: location,
+            title: displayTitle,
+            subtitle: displaySubtitle
+        )
+        return location
     }
     
     static func fromOpenMeteo(_ result: OpenMeteoLocationResult) -> LocationSearchResult? {
@@ -200,6 +196,48 @@ struct LocationSearchResult {
     
     private static func coordinateTitle(latitude: Double, longitude: Double) -> String {
         return String(format: "%.4f, %.4f", latitude, longitude)
+    }
+    
+    private var administrativeCity: String {
+        nonEmpty(admin3)
+        ?? nonEmpty(admin2)
+        ?? (source == .systemGeocoder ? nil : nonEmpty(localizedName))
+        ?? nonEmpty(name)
+        ?? Self.coordinateTitle(latitude: latitude, longitude: longitude)
+    }
+    
+    private var administrativeDistrict: String {
+        let city = administrativeCity
+        let district = nonEmpty(admin4)
+        return district != city ? (district ?? "") : ""
+    }
+    
+    private var administrativeParts: [String?] {
+        [
+            nonEmpty(admin1),
+            nonEmpty(admin2),
+            nonEmpty(admin3),
+            nonEmpty(admin4)
+        ]
+    }
+    
+    fileprivate var administrativeQuality: Int {
+        var quality = administrativeParts.compactMap { $0 }.count
+        if source == .systemGeocoder {
+            quality += 1
+        }
+        return quality
+    }
+    
+    private static func joinDisplayParts(_ parts: [String?]) -> String {
+        parts
+            .compactMap { $0 }
+            .reduce(into: [String]()) { result, item in
+                if !result.contains(item) {
+                    result.append(item)
+                }
+            }
+            .joined(separator: " ")
     }
 }
 
@@ -462,12 +500,15 @@ final class LocationSearchCoordinator {
     static func deduplicate(_ results: [LocationSearchResult]) -> [LocationSearchResult] {
         var unique = [LocationSearchResult]()
         for result in results {
-            let exists = unique.contains { item in
+            if let index = unique.firstIndex(where: { item in
                 abs(item.latitude - result.latitude) < 0.02
                 && abs(item.longitude - result.longitude) < 0.02
                 && namesClose(item.displayTitle, result.displayTitle)
-            }
-            if !exists {
+            }) {
+                if result.administrativeQuality > unique[index].administrativeQuality {
+                    unique[index] = result
+                }
+            } else {
                 unique.append(result)
             }
         }
@@ -501,6 +542,7 @@ final class LocationSearchCoordinator {
         if result.source == .remoteGeocoding {
             score += 5
         }
+        score += result.administrativeQuality * 5
         return score
     }
     

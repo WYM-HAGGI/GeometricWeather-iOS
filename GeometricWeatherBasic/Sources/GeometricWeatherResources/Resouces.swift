@@ -131,6 +131,13 @@ public extension Bundle {
 // MARK: - text.
 
 private let locationDetailTextUserDefaultsPrefix = "location_detail_text_"
+private let locationSearchTitleUserDefaultsPrefix = "location_search_title_"
+private let locationSearchSubtitleUserDefaultsPrefix = "location_search_subtitle_"
+
+public struct LocationSearchDisplayText {
+    public let title: String
+    public let subtitle: String?
+}
 
 public func getLocalizedText(_ key: String) -> String {
     let defaultValue = NSLocalizedString(
@@ -218,6 +225,38 @@ public func saveLocationDetailText(location: Location, detail: String?) {
     }
     
     UserDefaults.standard.set(detail, forKey: key)
+}
+
+public func saveLocationSearchDisplayText(location: Location, title: String?, subtitle: String?) {
+    let titleKey = locationSearchTitleUserDefaultsPrefix + location.formattedId
+    let subtitleKey = locationSearchSubtitleUserDefaultsPrefix + location.formattedId
+    
+    if let title = title?.trimmingCharacters(in: .whitespacesAndNewlines), !title.isEmpty {
+        UserDefaults.standard.set(title, forKey: titleKey)
+    } else {
+        UserDefaults.standard.removeObject(forKey: titleKey)
+    }
+    
+    if let subtitle = subtitle?.trimmingCharacters(in: .whitespacesAndNewlines), !subtitle.isEmpty {
+        UserDefaults.standard.set(subtitle, forKey: subtitleKey)
+    } else {
+        UserDefaults.standard.removeObject(forKey: subtitleKey)
+    }
+}
+
+public func getLocationSearchDisplayText(location: Location) -> LocationSearchDisplayText? {
+    let titleKey = locationSearchTitleUserDefaultsPrefix + location.formattedId
+    let subtitleKey = locationSearchSubtitleUserDefaultsPrefix + location.formattedId
+    guard let title = UserDefaults.standard.string(forKey: titleKey)?.trimmingCharacters(in: .whitespacesAndNewlines),
+          !title.isEmpty else {
+        return nil
+    }
+    
+    let subtitle = UserDefaults.standard.string(forKey: subtitleKey)?.trimmingCharacters(in: .whitespacesAndNewlines)
+    return LocationSearchDisplayText(
+        title: title,
+        subtitle: subtitle?.isEmpty == false ? subtitle : nil
+    )
 }
 
 private func getStoredLocationDetailText(location: Location) -> String? {

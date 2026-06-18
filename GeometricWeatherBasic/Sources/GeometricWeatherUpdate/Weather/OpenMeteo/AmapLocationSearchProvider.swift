@@ -14,9 +14,9 @@ enum AmapConfig {
     // or backend-controlled configuration. Do not commit a real AMap Web Service key.
     static var apiKey: String {
         let values = [
-            Bundle.main.object(forInfoDictionaryKey: "AMAP_WEB_SERVICE_KEY") as? String,
-            ProcessInfo.processInfo.environment["AMAP_WEB_SERVICE_KEY"],
-            UserDefaults.standard.string(forKey: "AMAP_WEB_SERVICE_KEY")
+            Bundle.main.object(forInfoDictionaryKey: "AMAP_API_KEY") as? String,
+            ProcessInfo.processInfo.environment["AMAP_API_KEY"],
+            UserDefaults.standard.string(forKey: "AMAP_API_KEY")
         ]
         return values
             .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }

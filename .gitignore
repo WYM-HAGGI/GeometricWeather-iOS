@@ -69,4 +69,7 @@ fastlane/test_output
 # https://github.com/johnno1962/injectionforxcode
 
 iOSInjectionProject/
+
+# Local API keys. Keep real service keys out of git.
+Config/LocalConfig.xcconfig
 {"mode":"full","isActive":false}

@@ -28,8 +28,8 @@
 	<string>public.app-category.weather</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>AMAP_WEB_SERVICE_KEY</key>
-	<string></string>
+	<key>AMAP_API_KEY</key>
+	<string>$(AMAP_API_KEY)</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app needs access to location when updating weather data in background and foreground.</string>
 	<key>NSLocationAlwaysUsageDescription</key>

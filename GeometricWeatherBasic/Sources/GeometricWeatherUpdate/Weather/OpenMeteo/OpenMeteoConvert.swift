@@ -631,7 +631,7 @@ enum OpenMeteoConvert {
         }
     }
     
-    private static func stableCityId(latitude: Double, longitude: Double) -> String {
+    static func stableCityId(latitude: Double, longitude: Double) -> String {
         return "openmeteo_\(String(format: "%.4f", latitude))_\(String(format: "%.4f", longitude))"
     }
     

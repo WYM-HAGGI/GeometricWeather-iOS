@@ -18,16 +18,21 @@ final class OpenMeteoService {
     
     func searchLocation(
         query: String,
+        language: String? = nil,
         completion: @escaping (Result<OpenMeteoGeocodingResponse, Error>) -> Void
     ) {
+        var queryItems = [
+            URLQueryItem(name: "name", value: query),
+            URLQueryItem(name: "count", value: "10"),
+            URLQueryItem(name: "format", value: "json")
+        ]
+        if let language = language, !language.isEmpty {
+            queryItems.append(URLQueryItem(name: "language", value: language))
+        }
+        
         request(
             base: "https://geocoding-api.open-meteo.com/v1/search",
-            queryItems: [
-                URLQueryItem(name: "name", value: query),
-                URLQueryItem(name: "count", value: "10"),
-                URLQueryItem(name: "language", value: currentLanguageCode(for: query)),
-                URLQueryItem(name: "format", value: "json")
-            ],
+            queryItems: queryItems,
             completion: completion
         )
     }
@@ -196,20 +201,6 @@ final class OpenMeteoService {
         tasks.removeAll { task in
             task.originalRequest?.url == url
         }
-    }
-    
-    private func currentLanguageCode(for query: String) -> String {
-        if query.unicodeScalars.allSatisfy({ scalar in
-            scalar.isASCII
-        }) {
-            return "en"
-        }
-        
-        let language = Bundle.main.preferredLocalizations.first ?? Locale.current.languageCode ?? "en"
-        if language.hasPrefix("zh") {
-            return "zh"
-        }
-        return language.components(separatedBy: "-").first ?? "en"
     }
 }
 

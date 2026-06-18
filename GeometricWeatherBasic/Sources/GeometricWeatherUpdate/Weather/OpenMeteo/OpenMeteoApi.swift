@@ -12,9 +12,13 @@ import GeometricWeatherCore
 public final class OpenMeteoApi: WeatherApi {
     
     private let service = OpenMeteoService()
-    private let locationGeocoder = CLGeocoder()
-    private let searchLocalizationGeocoder = CLGeocoder()
     private let reverseGeocoder = CLGeocoder()
+    private lazy var searchCoordinator = LocationSearchCoordinator(
+        remoteProvider: OpenMeteoLocationSearchProvider(service: service),
+        appleProvider: AppleGeocoderLocationSearchProvider(),
+        localProvider: LocalCacheLocationSearchProvider(cache: InMemoryLocationSearchCache.shared),
+        cache: InMemoryLocationSearchCache.shared
+    )
     private static var reverseGeocodeCache = [String: Location]()
     
     public init() {
@@ -25,49 +29,17 @@ public final class OpenMeteoApi: WeatherApi {
         _ query: String,
         callback: @escaping ([Location]) -> Void
     ) {
-        let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty else {
+        let normalized = LocationSearchNormalizer.normalize(query)
+        guard !normalized.isEmpty else {
             callbackOnMain([], callback)
             return
         }
         
-        if containsHanText(query) {
-            locationGeocoder.geocodeAddressString(query) { [weak self] placemarks, error in
-                if let error = error {
-                    printLog(keyword: "location", content: "Apple location search error: \(error)")
-                }
-                
-                let locations = placemarks?.compactMap {
-                    OpenMeteoConvert.generateLocation(from: $0)
-                } ?? []
-                if !locations.isEmpty {
-                    callbackOnMain(locations, callback)
-                    return
-                }
-                
-                self?.requestOpenMeteoLocation(query: query, callback: callback)
-            }
-            return
-        }
-        
-        requestOpenMeteoLocation(query: query, callback: callback)
-    }
-    
-    private func requestOpenMeteoLocation(
-        query: String,
-        callback: @escaping ([Location]) -> Void
-    ) {
-        service.searchLocation(query: query) { result in
-            switch result {
-            case .success(let response):
-                self.localizeLocations(
-                    OpenMeteoConvert.generateLocations(from: response),
-                    callback: callback
-                )
-            case .failure(let error):
-                printLog(keyword: "network", content: "Open-Meteo location search error: \(error)")
-                callbackOnMain([], callback)
-            }
+        searchCoordinator.search(normalized.trimmed) { results in
+            callbackOnMain(
+                results.compactMap { $0.toLocation() },
+                callback
+            )
         }
     }
     
@@ -151,8 +123,7 @@ public final class OpenMeteoApi: WeatherApi {
     
     public func cancel() {
         service.cancel()
-        locationGeocoder.cancelGeocode()
-        searchLocalizationGeocoder.cancelGeocode()
+        searchCoordinator.cancel()
         reverseGeocoder.cancelGeocode()
     }
     
@@ -160,36 +131,6 @@ public final class OpenMeteoApi: WeatherApi {
         return "\(String(format: "%.4f", latitude)),\(String(format: "%.4f", longitude))"
     }
     
-    private func localizeLocations(
-        _ locations: [Location],
-        index: Int = 0,
-        localized: [Location] = [],
-        callback: @escaping ([Location]) -> Void
-    ) {
-        guard index < locations.count, index < 6 else {
-            callbackOnMain(localized + Array(locations.dropFirst(index)), callback)
-            return
-        }
-        
-        let location = locations[index]
-        searchLocalizationGeocoder.reverseGeocodeLocation(
-            CLLocation(latitude: location.latitude, longitude: location.longitude)
-        ) { [weak self] placemarks, error in
-            if let error = error {
-                printLog(keyword: "location", content: "Open-Meteo search localization error: \(error)")
-            }
-            
-            let localizedLocation = placemarks?.first.flatMap {
-                OpenMeteoConvert.generateLocation(from: $0, src: location)
-            } ?? location
-            self?.localizeLocations(
-                locations,
-                index: index + 1,
-                localized: localized + [localizedLocation],
-                callback: callback
-            )
-        }
-    }
 }
 
 private func callbackOnMain<T>(_ value: T, _ callback: @escaping (T) -> Void) {
@@ -200,10 +141,6 @@ private func callbackOnMain<T>(_ value: T, _ callback: @escaping (T) -> Void) {
             callback(value)
         }
     }
-}
-
-private func containsHanText(_ text: String) -> Bool {
-    return text.range(of: "\\p{Han}", options: .regularExpression) != nil
 }
 
 private final class SingleLocationCallback {

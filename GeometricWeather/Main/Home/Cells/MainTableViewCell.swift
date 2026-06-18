@@ -118,13 +118,13 @@ class MainTableViewCell: UITableViewCell, AbstractMainItem {
                 make.trailing.equalToSuperview()
             }
             self.titleVibrancyContainer.snp.remakeConstraints { make in
-                make.top.equalTo(timeBar.snp.bottom).offset(littleMargin)
+                make.top.equalTo(timeBar.snp.bottom).offset(MainCardLayoutMetrics.sectionSpacing)
                 make.leading.equalToSuperview().offset(normalMargin)
                 make.trailing.equalToSuperview().offset(-normalMargin)
             }
         } else {
             self.titleVibrancyContainer.snp.remakeConstraints { make in
-                make.top.equalToSuperview().offset(normalMargin)
+                make.top.equalToSuperview().offset(MainCardLayoutMetrics.titleTopPadding)
                 make.leading.equalToSuperview().offset(normalMargin)
                 make.trailing.equalToSuperview().offset(-normalMargin)
             }

@@ -13,7 +13,7 @@ import GeometricWeatherDB
 import GeometricWeatherTheme
 import SwiftUI
 
-private let dailyTrendViewHeight = 286
+private let dailyTrendViewHeight = MainCardLayoutMetrics.dailyTrendHeight
 
 struct DailyTrendCellTapAction {
     let index: Int
@@ -74,7 +74,7 @@ class MainDailyCardCell: MainTableViewCell,
         self.cardContainer.contentView.addSubview(self.dailyBackgroundView)
         
         self.titleVibrancyContainer.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(littleMargin)
+            make.top.equalToSuperview().offset(MainCardLayoutMetrics.titleTopPadding)
             make.leading.equalToSuperview().offset(normalMargin)
             make.trailing.equalToSuperview().offset(-normalMargin)
         }
@@ -84,17 +84,17 @@ class MainDailyCardCell: MainTableViewCell,
             make.trailing.equalToSuperview().offset(-normalMargin)
         }
         self.dailyTagView.snp.makeConstraints { make in
-            make.top.equalTo(self.summaryLabel.snp.bottom).offset(littleMargin)
+            make.top.equalTo(self.summaryLabel.snp.bottom).offset(MainCardLayoutMetrics.sectionSpacing)
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
-            make.height.equalTo(44)
+            make.height.equalTo(MainCardLayoutMetrics.tagHeight)
         }
         self.dailyBackgroundView.snp.makeConstraints { make in
-            make.top.equalTo(self.dailyTagView.snp.bottom).offset(littleMargin)
+            make.top.equalTo(self.dailyTagView.snp.bottom).offset(MainCardLayoutMetrics.sectionSpacing)
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
             make.height.equalTo(dailyTrendViewHeight)
-            make.bottom.equalToSuperview().offset(-normalMargin)
+            make.bottom.equalToSuperview().offset(-MainCardLayoutMetrics.cardBottomPadding)
         }
         self.dailyCollectionView.snp.makeConstraints { make in
             make.top.equalTo(self.dailyBackgroundView.snp.top)

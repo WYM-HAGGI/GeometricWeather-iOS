@@ -91,6 +91,7 @@
 		379A8B3027C8C59000083BFF /* MainAllergenCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A6A27C8C59000083BFF /* MainAllergenCardCell.swift */; };
 		379A8B3127C8C59000083BFF /* MainDailyCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A6B27C8C59000083BFF /* MainDailyCardCell.swift */; };
 		379A8B3227C8C59000083BFF /* MainTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A6C27C8C59000083BFF /* MainTableViewCell.swift */; };
+		379A8B3327C8C59000083B00 /* MainCardLayoutMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A6C27C8C59000083B00 /* MainCardLayoutMetrics.swift */; };
 		379A8B3327C8C59000083BFF /* HomeViewController+Events.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A6D27C8C59000083BFF /* HomeViewController+Events.swift */; };
 		379A8B3427C8C59000083BFF /* HomeViewController+UITableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A6E27C8C59000083BFF /* HomeViewController+UITableView.swift */; };
 		379A8B3527C8C59000083BFF /* HomeViewController+Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A6F27C8C59000083BFF /* HomeViewController+Layout.swift */; };
@@ -388,6 +389,7 @@
 		379A8A6927C8C59000083BFF /* AllergenCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AllergenCollectionViewCell.swift; sourceTree = "<group>"; };
 		379A8A6A27C8C59000083BFF /* MainAllergenCardCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainAllergenCardCell.swift; sourceTree = "<group>"; };
 		379A8A6B27C8C59000083BFF /* MainDailyCardCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainDailyCardCell.swift; sourceTree = "<group>"; };
+		379A8A6C27C8C59000083B00 /* MainCardLayoutMetrics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainCardLayoutMetrics.swift; sourceTree = "<group>"; };
 		379A8A6C27C8C59000083BFF /* MainTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTableViewCell.swift; sourceTree = "<group>"; };
 		379A8A6D27C8C59000083BFF /* HomeViewController+Events.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "HomeViewController+Events.swift"; sourceTree = "<group>"; };
 		379A8A6E27C8C59000083BFF /* HomeViewController+UITableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "HomeViewController+UITableView.swift"; sourceTree = "<group>"; };
@@ -896,6 +898,7 @@
 			children = (
 				379A8A5C27C8C59000083BFF /* Trend */,
 				379A8A7827C8C59000083BFF /* MainTableViewHeaderView.swift */,
+				379A8A6C27C8C59000083B00 /* MainCardLayoutMetrics.swift */,
 				379A8A6C27C8C59000083BFF /* MainTableViewCell.swift */,
 				379A8A6B27C8C59000083BFF /* MainDailyCardCell.swift */,
 				379A8A5A27C8C59000083BFF /* MainHourlyCardCell.swift */,
@@ -1727,6 +1730,7 @@
 				379A8B6C27C8C59100083BFF /* AppNotificationHelper.swift in Sources */,
 				379A8B4827C8C59000083BFF /* DailyViewController.swift in Sources */,
 				379A8BBE27C8C59100083BFF /* SettingsView.swift in Sources */,
+				379A8B3327C8C59000083B00 /* MainCardLayoutMetrics.swift in Sources */,
 				379A8B3E27C8C59000083BFF /* MainViewController.swift in Sources */,
 				379A8B3227C8C59000083BFF /* MainTableViewCell.swift in Sources */,
 				379A8B3727C8C59000083BFF /* HomeViewController.swift in Sources */,

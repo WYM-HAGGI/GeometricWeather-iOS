@@ -11,7 +11,7 @@ import GeometricWeatherCore
 import GeometricWeatherResources
 
 enum OpenMeteoConvert {
-    
+
     static func generateLocations(
         from response: OpenMeteoGeocodingResponse,
         src: Location? = nil
@@ -20,7 +20,7 @@ enum OpenMeteoConvert {
             generateLocation(from: item, src: src)
         } ?? []
     }
-    
+
     static func generateLocation(
         from result: OpenMeteoLocationResult,
         src: Location? = nil
@@ -31,11 +31,11 @@ enum OpenMeteoConvert {
         else {
             return nil
         }
-        
+
         let cityName = nonEmpty(result.name) ?? fallbackLocationName(latitude: latitude, longitude: longitude)
         let province = nonEmpty(result.admin1) ?? nonEmpty(result.admin2) ?? ""
         let district = nonEmpty(result.admin4) ?? nonEmpty(result.admin3) ?? ""
-        
+
         return Location(
             cityId: result.id.map { String($0) } ?? stableCityId(latitude: latitude, longitude: longitude),
             latitude: latitude,
@@ -51,7 +51,7 @@ enum OpenMeteoConvert {
             residentPosition: src?.residentPosition ?? false
         )
     }
-    
+
     static func generateLocationByCoordinate(target: Location) -> Location {
         return Location(
             cityId: target.usable ? target.cityId : stableCityId(
@@ -71,7 +71,7 @@ enum OpenMeteoConvert {
             residentPosition: target.residentPosition
         )
     }
-    
+
     static func generateLocationByCoordinate(
         target: Location,
         placemark: CLPlacemark
@@ -102,7 +102,7 @@ enum OpenMeteoConvert {
         )
         return location
     }
-    
+
     static func generateLocation(
         from placemark: CLPlacemark,
         src: Location? = nil
@@ -110,7 +110,7 @@ enum OpenMeteoConvert {
         guard let coordinate = placemark.location?.coordinate else {
             return nil
         }
-        
+
         let fallbackName = nonEmpty(placemark.name)
             ?? fallbackLocationName(latitude: coordinate.latitude, longitude: coordinate.longitude)
         let location = Location(
@@ -138,7 +138,7 @@ enum OpenMeteoConvert {
         )
         return location
     }
-    
+
     static func generateWeather(
         location: Location,
         forecast: OpenMeteoForecastResponse,
@@ -147,13 +147,13 @@ enum OpenMeteoConvert {
         guard let current = forecast.current else {
             return nil
         }
-        
+
         let hourlyAirQuality = generateHourlyAirQuality(airQuality?.hourly)
         let currentAirQuality = nearestAirQuality(
             hourlyAirQuality,
             to: current.time?.value ?? Date().timeIntervalSince1970
         )
-        
+
         let hourlies = generateHourlyList(
             hourly: forecast.hourly,
             hourlyAirQuality: hourlyAirQuality
@@ -163,7 +163,7 @@ enum OpenMeteoConvert {
             hourlies: hourlies,
             timezone: TimeZone(identifier: forecast.timezone ?? "") ?? location.timezone
         )
-        
+
         return Weather(
             base: Base(
                 cityId: location.cityId,
@@ -205,7 +205,7 @@ enum OpenMeteoConvert {
             alerts: []
         )
     }
-    
+
     private static func generateHourlyList(
         hourly: OpenMeteoHourly?,
         hourlyAirQuality: [TimeInterval: AirQuality]
@@ -213,14 +213,14 @@ enum OpenMeteoConvert {
         guard let time = hourly?.time else {
             return []
         }
-        
+
         let maxCount = min(time.count, 72)
         var result = [Hourly]()
         for index in 0 ..< maxCount {
             guard let timestamp = time.get(index)?.value else {
                 continue
             }
-            
+
             let weatherCode = hourly?.weatherCode?.get(index) ?? nil
             let airQuality = nearestAirQuality(hourlyAirQuality, to: timestamp)
             result.append(
@@ -250,7 +250,7 @@ enum OpenMeteoConvert {
         }
         return result
     }
-    
+
     private static func generateDailyList(
         daily: OpenMeteoDaily?,
         hourlies: [Hourly],
@@ -259,14 +259,14 @@ enum OpenMeteoConvert {
         guard let time = daily?.time else {
             return []
         }
-        
+
         let maxCount = min(time.count, 15)
         var result = [Daily]()
         for index in 0 ..< maxCount {
             guard let timestamp = time.get(index)?.value else {
                 continue
             }
-            
+
             let weatherCode = daily?.weatherCode?.get(index) ?? nil
             let text = OpenMeteoIconMapper.weatherText(from: weatherCode)
             let code = OpenMeteoIconMapper.weatherCode(from: weatherCode)
@@ -277,7 +277,7 @@ enum OpenMeteoConvert {
             )
             let dayTemperature = roundedInt(daily?.temperature2mMax?.get(index) ?? nil)
             let nightTemperature = roundedInt(daily?.temperature2mMin?.get(index) ?? nil)
-            
+
             result.append(
                 Daily(
                     time: timestamp,
@@ -325,10 +325,7 @@ enum OpenMeteoConvert {
                         riseTime: nil,
                         setTime: nil
                     ),
-                    moonPhase: MoonPhase(
-                        angle: nil,
-                        description: nil
-                    ),
+                    moonPhase: generateMoonPhase(for: timestamp),
                     precipitationTotal: daily?.precipitationSum?.get(index) ?? nil,
                     precipitationIntensity: daily?.precipitationSum?.get(index) ?? nil,
                     precipitationProbability: daily?.precipitationProbabilityMax?.get(index) ?? nil,
@@ -350,7 +347,7 @@ enum OpenMeteoConvert {
         }
         return result
     }
-    
+
     private static func generateMinutely(_ minutely: OpenMeteoMinutely?) -> Minutely? {
         guard
             let times = minutely?.time,
@@ -359,7 +356,7 @@ enum OpenMeteoConvert {
         else {
             return nil
         }
-        
+
         let intensities = minutely?.precipitation?
             .compactMap { value in
                 value.map { $0 * 4.0 }
@@ -373,12 +370,12 @@ enum OpenMeteoConvert {
             precipitationIntensities: intensities
         )
     }
-    
+
     private static func generateHourlyAirQuality(_ hourly: OpenMeteoAirQualityHourly?) -> [TimeInterval: AirQuality] {
         guard let times = hourly?.time else {
             return [:]
         }
-        
+
         var result = [TimeInterval: AirQuality]()
         for index in 0 ..< times.count {
             guard let time = times.get(index)?.value else {
@@ -400,7 +397,7 @@ enum OpenMeteoConvert {
         }
         return result
     }
-    
+
     private static func nearestAirQuality(
         _ airQuality: [TimeInterval: AirQuality],
         to timestamp: TimeInterval
@@ -409,7 +406,7 @@ enum OpenMeteoConvert {
             abs(first.key - timestamp) < abs(second.key - timestamp)
         }?.value
     }
-    
+
     private static func generateWind(
         degree: Double?,
         speed: Double?
@@ -424,7 +421,7 @@ enum OpenMeteoConvert {
             level: getWindLevelInt(speed: speed ?? 0)
         )
     }
-    
+
     private static func getWindDirectionText(_ degree: Double?) -> String? {
         guard let degree = degree else {
             return nil
@@ -477,13 +474,14 @@ enum OpenMeteoConvert {
         }
         return getLocalizedText("wind_direction_nnw")
     }
-    
+
     private static func hourliesForDay(
         _ day: TimeInterval,
         hourlies: [Hourly],
         timezone: TimeZone
     ) -> [Hourly] {
-        let calendar = Calendar.current
+        var calendar = Calendar.current
+        calendar.timeZone = timezone
         let dayDate = Date(timeIntervalSince1970: day)
         return hourlies.filter { hourly in
             calendar.isDate(
@@ -492,28 +490,63 @@ enum OpenMeteoConvert {
             )
         }
     }
-    
+
+    private static func generateMoonPhase(for timestamp: TimeInterval) -> MoonPhase {
+        let knownNewMoon = 947182440.0 // 2000-01-06 18:14 UTC.
+        let synodicMonth = 29.530588853 * 24.0 * 60.0 * 60.0
+        var phase = (timestamp - knownNewMoon)
+            .truncatingRemainder(dividingBy: synodicMonth) / synodicMonth
+        if phase < 0 {
+            phase += 1.0
+        }
+
+        let description: String
+        switch phase {
+        case 0.0 ..< 0.03, 0.97 ... 1.0:
+            description = "new"
+        case 0.03 ..< 0.22:
+            description = "waxingcrescent"
+        case 0.22 ..< 0.28:
+            description = "first"
+        case 0.28 ..< 0.47:
+            description = "waxinggibbous"
+        case 0.47 ..< 0.53:
+            description = "full"
+        case 0.53 ..< 0.72:
+            description = "waninggibbous"
+        case 0.72 ..< 0.78:
+            description = "third"
+        default:
+            description = "waningcrescent"
+        }
+
+        return MoonPhase(
+            angle: Int((phase * 360.0).rounded()),
+            description: description
+        )
+    }
+
     private static func roundedInt(_ value: Double?) -> Int {
         return Int((value ?? 0).rounded())
     }
-    
+
     private static func roundedOptionalInt(_ value: Double?) -> Int? {
         return value.map { Int($0.rounded()) }
     }
-    
+
     private static func visibilityInKilometers(_ meters: Double?) -> Double? {
         // Open-Meteo visibility is returned in meters. The app's DistanceUnit
         // uses kilometers as its default model unit before formatting.
         return meters.map { $0 / 1000.0 }
     }
-    
+
     private static func average(_ values: [Double]) -> Double? {
         if values.isEmpty {
             return nil
         }
         return values.reduce(0, +) / Double(values.count)
     }
-    
+
     private static func emptyAirQuality() -> AirQuality {
         return AirQuality(
             aqiLevel: nil,
@@ -526,7 +559,7 @@ enum OpenMeteoConvert {
             co: nil
         )
     }
-    
+
     private static func emptyPollen() -> Pollen {
         return Pollen(
             grassIndex: nil,
@@ -543,7 +576,7 @@ enum OpenMeteoConvert {
             treeDescription: nil
         )
     }
-    
+
     private static func estimateAqi(pm25: Double) -> Int {
         if pm25 <= 12 {
             return Int(pm25 / 12.0 * 50.0)
@@ -562,14 +595,14 @@ enum OpenMeteoConvert {
         }
         return 301
     }
-    
+
     private static func nonEmpty(_ value: String?) -> String? {
         guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty else {
             return nil
         }
         return value
     }
-    
+
     private static func generateDetailAddress(from placemark: CLPlacemark) -> String? {
         let compact = shouldCompactPlacemark(placemark)
         var detail = joinUnique(
@@ -582,7 +615,7 @@ enum OpenMeteoConvert {
             ],
             compact: compact
         )
-        
+
         if detail.isEmpty {
             detail = joinUnique(
                 [
@@ -594,7 +627,7 @@ enum OpenMeteoConvert {
                 compact: compact
             )
         }
-        
+
         if detail.isEmpty {
             return nil
         }
@@ -606,7 +639,7 @@ enum OpenMeteoConvert {
         }
         return detail
     }
-    
+
     private static func joinUnique(_ parts: [String?], compact: Bool) -> String {
         var result = [String]()
         for part in parts {
@@ -617,7 +650,7 @@ enum OpenMeteoConvert {
         }
         return result.joined(separator: compact ? "" : ", ")
     }
-    
+
     private static func shouldCompactPlacemark(_ placemark: CLPlacemark) -> Bool {
         return [
             placemark.country,
@@ -630,11 +663,11 @@ enum OpenMeteoConvert {
             text?.range(of: "\\p{Han}", options: .regularExpression) != nil
         }
     }
-    
+
     static func stableCityId(latitude: Double, longitude: Double) -> String {
         return "openmeteo_\(String(format: "%.4f", latitude))_\(String(format: "%.4f", longitude))"
     }
-    
+
     private static func fallbackLocationName(latitude: Double, longitude: Double) -> String {
         return String(format: "%.4f, %.4f", latitude, longitude)
     }

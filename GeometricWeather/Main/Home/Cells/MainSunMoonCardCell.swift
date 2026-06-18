@@ -17,35 +17,35 @@ private let iconSize = 20.0
 private let innerMargin = 4.0
 
 class MainSunMoonCardCell: MainTableViewCell {
-    
+
     // MARK: - subviews.
-    
+
     private let moonPhaseView = MoonPhaseView(frame: .zero)
     private let moonPhaseLabel = UILabel(frame: .zero)
-    
+
     private let sunMoonPathView = SunMoonPathView(frame: .zero)
-    
+
     private let sunIcon = UIImageView(frame: .zero)
     private let sunLabel = UILabel(frame: .zero)
-    
+
     private let moonIcon = UIImageView(frame: .zero)
     private let moonLabel = UILabel(frame: .zero)
-    
+
     // MARK: - life cycle.
-    
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
+
         self.cardTitle.text = getLocalizedText("sunrise_sunset")
-        
+
         self.cardContainer.contentView.addSubview(self.moonPhaseView)
-        
+
         self.moonPhaseLabel.font = bodyFont
         self.moonPhaseLabel.textColor = .label
         self.cardContainer.contentView.addSubview(self.moonPhaseLabel)
-        
+
         self.cardContainer.contentView.addSubview(self.sunMoonPathView)
-        
+
         self.sunIcon.image = UIImage.getSunIcon()?.scaleToSize(
             CGSize(
                 width: iconSize,
@@ -54,12 +54,12 @@ class MainSunMoonCardCell: MainTableViewCell {
         )
         self.sunIcon.contentMode = .scaleAspectFit
         self.cardContainer.contentView.addSubview(self.sunIcon)
-        
+
         self.sunLabel.font = miniCaptionFont
         self.sunLabel.textColor = .secondaryLabel
         self.sunLabel.numberOfLines = 2
         self.cardContainer.contentView.addSubview(self.sunLabel)
-        
+
         self.moonIcon.image = UIImage.getMoonIcon()?.scaleToSize(
             CGSize(
                 width: iconSize,
@@ -68,15 +68,15 @@ class MainSunMoonCardCell: MainTableViewCell {
         )
         self.moonIcon.contentMode = .scaleAspectFit
         self.cardContainer.contentView.addSubview(self.moonIcon)
-        
+
         self.moonLabel.font = miniCaptionFont
         self.moonLabel.textAlignment = isRtl ? .left : .right
         self.moonLabel.textColor = .secondaryLabel
         self.moonLabel.numberOfLines = 2
         self.cardContainer.contentView.addSubview(self.moonLabel)
-        
+
         self.titleVibrancyContainer.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(normalMargin)
+            make.top.equalToSuperview().offset(MainCardLayoutMetrics.titleTopPadding)
             make.leading.equalToSuperview().offset(normalMargin)
             make.trailing.equalToSuperview().offset(-normalMargin)
         }
@@ -90,54 +90,54 @@ class MainSunMoonCardCell: MainTableViewCell {
             make.trailing.equalTo(self.moonPhaseView.snp.leading).offset(-innerMargin)
         }
         self.sunMoonPathView.snp.makeConstraints { make in
-            make.top.equalTo(self.titleVibrancyContainer.snp.bottom).offset(littleMargin)
+            make.top.equalTo(self.titleVibrancyContainer.snp.bottom).offset(MainCardLayoutMetrics.sectionSpacing)
             make.leading.equalToSuperview().offset(littleMargin)
             make.trailing.equalToSuperview().offset(-littleMargin)
-            make.height.equalTo(136)
+            make.height.equalTo(MainCardLayoutMetrics.sunMoonPathHeight)
         }
         self.sunIcon.snp.makeConstraints { make in
-            make.top.equalTo(self.sunMoonPathView.snp.bottom).offset(normalMargin)
+            make.top.equalTo(self.sunMoonPathView.snp.bottom).offset(MainCardLayoutMetrics.sectionSpacing)
             make.leading.equalToSuperview().offset(normalMargin)
             make.size.equalTo(iconSize)
-            make.bottom.equalToSuperview().offset(-normalMargin)
+            make.bottom.equalToSuperview().offset(-MainCardLayoutMetrics.cardBottomPadding)
         }
         self.sunLabel.snp.makeConstraints { make in
             make.leading.equalTo(self.sunIcon.snp.trailing).offset(innerMargin)
             make.centerY.equalTo(self.sunIcon.snp.centerY)
         }
         self.moonIcon.snp.makeConstraints { make in
-            make.top.equalTo(self.sunMoonPathView.snp.bottom).offset(normalMargin)
+            make.top.equalTo(self.sunMoonPathView.snp.bottom).offset(MainCardLayoutMetrics.sectionSpacing)
             make.trailing.equalToSuperview().offset(-normalMargin)
             make.size.equalTo(iconSize)
-            make.bottom.equalToSuperview().offset(-normalMargin)
+            make.bottom.equalToSuperview().offset(-MainCardLayoutMetrics.cardBottomPadding)
         }
         self.moonLabel.snp.makeConstraints { make in
             make.trailing.equalTo(self.moonIcon.snp.leading).offset(-innerMargin)
             make.centerY.equalTo(self.moonIcon.snp.centerY)
         }
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func bindData(location: Location, timeBar: MainTimeBarView?) {
         super.bindData(location: location, timeBar: timeBar)
-        
+
         guard let weather = location.weather else {
             return
         }
-        
+
         // moon phase.
-        
+
         if let angle = weather.dailyForecasts[0].moonPhase.angle,
             let _ = weather.dailyForecasts[0].moonPhase.description {
             self.moonPhaseView.alpha = 1.0
             self.moonPhaseLabel.alpha = 1.0
-            
+
             self.moonPhaseView.angle = Double(angle)
             self.moonPhaseView.lightColor = .white
-            
+
             self.moonPhaseLabel.text = getLocalizedText(
                 weather.dailyForecasts[0].moonPhase.getMoonPhaseKey()
             )
@@ -145,62 +145,59 @@ class MainSunMoonCardCell: MainTableViewCell {
             self.moonPhaseView.alpha = 0.0
             self.moonPhaseLabel.alpha = 0.0
         }
-        
+
         // sun moon path view.
-        
+
         self.sunMoonPathView.sunIconImage = UIImage.getSunIcon()
         self.sunMoonPathView.moonIconImage = UIImage.getMoonIcon()
-        
+
         // sun moon description.
-        
-        if let riseTime = weather.dailyForecasts[0].sun.riseTime,
-            let setTime = weather.dailyForecasts[0].sun.setTime {
+
+        if weather.dailyForecasts[0].sun.riseTime != nil
+            || weather.dailyForecasts[0].sun.setTime != nil {
             self.sunIcon.alpha = 1.0
             self.sunLabel.alpha = 1.0
-            
-            self.sunLabel.text = formateTime(
-                timeIntervalSine1970: riseTime,
-                twelveHour: isTwelveHour()
-            ) + "↑" + "\n" + formateTime(
-                timeIntervalSine1970: setTime,
-                twelveHour: isTwelveHour()
-            ) + "↓"
+
+            self.sunLabel.text = self.astroText(
+                riseKey: "content_des_sunrise",
+                setKey: "content_des_sunset",
+                astro: weather.dailyForecasts[0].sun
+            )
         } else {
             self.sunIcon.alpha = 0.0
             self.sunLabel.alpha = 0.0
         }
-        if let riseTime = weather.dailyForecasts[0].moon.riseTime,
-            let setTime = weather.dailyForecasts[0].moon.setTime {
+        if weather.dailyForecasts[0].moon.riseTime != nil
+            || weather.dailyForecasts[0].moon.setTime != nil
+            || weather.dailyForecasts[0].moonPhase.isValid() {
             self.moonIcon.alpha = 1.0
             self.moonLabel.alpha = 1.0
-            
-            self.moonLabel.text = formateTime(
-                timeIntervalSine1970: riseTime,
-                twelveHour: isTwelveHour()
-            ) + "↑" + "\n" + formateTime(
-                timeIntervalSine1970: setTime,
-                twelveHour: isTwelveHour()
-            ) + "↓"
+
+            self.moonLabel.text = self.astroText(
+                riseKey: "content_des_moonrise",
+                setKey: "content_des_moonset",
+                astro: weather.dailyForecasts[0].moon
+            )
         } else {
             self.moonIcon.alpha = 0.0
             self.moonLabel.alpha = 0.0
         }
-        
+
         // theme colors.
         let color = ThemeManager.weatherThemeDelegate.getThemeColor(
             weatherKind: weatherCodeToWeatherKind(code: weather.current.weatherCode),
             daylight: location.isDaylight
         )
-        
+
         self.moonPhaseView.lightColor = UIColor(color * 0.5 + .white * 0.5)
         self.moonPhaseView.darkColor = UIColor(color)
         self.moonPhaseView.borderColor = UIColor(color)
-        
+
         self.sunMoonPathView.sunColor = UIColor(color)
         self.sunMoonPathView.moonColor = UIColor(color)
         self.sunMoonPathView.backgroundLineColor = UIColor(color)
     }
-    
+
     override func staggeredScrollIntoScreen(atFirstTime: Bool) {
         if atFirstTime {
             var sunProgress = -1.0
@@ -210,7 +207,7 @@ class MainSunMoonCardCell: MainTableViewCell {
                     in: self.location?.timezone ?? .current
                 ).keepIn(range: 0...1)
             }
-            
+
             var moonProgress = -1.0
             if self.location?.weather?.dailyForecasts.get(0)?.moon.isValid() == true {
                 moonProgress = Astro.getRiseProgress(
@@ -218,7 +215,7 @@ class MainSunMoonCardCell: MainTableViewCell {
                     in: self.location?.timezone ?? .current
                 ).keepIn(range: 0...1)
             }
-            
+
             self.sunMoonPathView.setProgress(
                 (sunProgress, moonProgress),
                 withAnimationDuration: (
@@ -227,5 +224,22 @@ class MainSunMoonCardCell: MainTableViewCell {
                 )
             )
         }
+    }
+
+    private func astroText(riseKey: String, setKey: String, astro: Astro) -> String {
+        return self.localizedTimeText(
+            key: riseKey,
+            time: astro.riseTime
+        ) + "\n" + self.localizedTimeText(
+            key: setKey,
+            time: astro.setTime
+        )
+    }
+
+    private func localizedTimeText(key: String, time: TimeInterval?) -> String {
+        let value = time.map {
+            formateTime(timeIntervalSine1970: $0, twelveHour: isTwelveHour())
+        } ?? "--"
+        return getLocalizedText(key).replacingOccurrences(of: "$", with: value)
     }
 }

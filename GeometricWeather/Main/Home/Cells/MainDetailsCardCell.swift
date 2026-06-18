@@ -30,7 +30,7 @@ class MainDetailsCardCell: MainTableViewCell {
         self.cardContainer.contentView.addSubview(self.vstack)
         
         self.titleVibrancyContainer.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(normalMargin)
+            make.top.equalToSuperview().offset(MainCardLayoutMetrics.titleTopPadding)
             make.leading.equalToSuperview().offset(normalMargin)
             make.trailing.equalToSuperview().offset(-normalMargin)
         }
@@ -38,7 +38,7 @@ class MainDetailsCardCell: MainTableViewCell {
             make.top.equalTo(self.titleVibrancyContainer.snp.bottom)
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
-            make.bottom.equalToSuperview().offset(-normalMargin)
+            make.bottom.equalToSuperview().offset(-MainCardLayoutMetrics.cardBottomPadding)
         }
     }
     

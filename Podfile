@@ -7,11 +7,6 @@ target 'GeometricWeather' do
 
   # Pods for GeometricWeather
   
-  # moya.
-  pod 'Moya', '~> 15.0'
-  pod 'Moya/RxSwift', '~> 15.0'
-  pod 'Moya/ReactiveSwift', '~> 15.0'
-  
   # snapkit.
   pod 'SnapKit', '~> 5.0.0'
   

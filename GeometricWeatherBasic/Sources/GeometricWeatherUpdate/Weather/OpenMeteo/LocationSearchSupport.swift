@@ -44,8 +44,25 @@ enum LocationSearchNormalizer {
 
 enum LocationSearchSource: Equatable {
     case remoteGeocoding
+    case amap
     case localCache
     case systemGeocoder
+}
+
+enum CoordinateSystem: Equatable {
+    case wgs84
+    case gcj02
+    case bd09
+    case unknown
+}
+
+enum LocationSearchResultType: Equatable {
+    case city
+    case district
+    case township
+    case poi
+    case address
+    case unknown
 }
 
 private func nonEmpty(_ value: String?) -> String? {
@@ -63,11 +80,60 @@ struct LocationSearchResult {
     let admin2: String?
     let admin3: String?
     let admin4: String?
+    let township: String?
+    let address: String?
     let latitude: Double
     let longitude: Double
+    let weatherLatitude: Double
+    let weatherLongitude: Double
+    let coordinateSystem: CoordinateSystem
     let timezone: String?
     let source: LocationSearchSource
     let sourceId: String?
+    let resultType: LocationSearchResultType
+    let category: String?
+    
+    init(
+        name: String,
+        localizedName: String? = nil,
+        country: String? = nil,
+        admin1: String? = nil,
+        admin2: String? = nil,
+        admin3: String? = nil,
+        admin4: String? = nil,
+        township: String? = nil,
+        address: String? = nil,
+        latitude: Double,
+        longitude: Double,
+        weatherLatitude: Double? = nil,
+        weatherLongitude: Double? = nil,
+        coordinateSystem: CoordinateSystem = .wgs84,
+        timezone: String? = nil,
+        source: LocationSearchSource,
+        sourceId: String? = nil,
+        resultType: LocationSearchResultType = .unknown,
+        category: String? = nil
+    ) {
+        self.name = name
+        self.localizedName = localizedName
+        self.country = country
+        self.admin1 = admin1
+        self.admin2 = admin2
+        self.admin3 = admin3
+        self.admin4 = admin4
+        self.township = township
+        self.address = address
+        self.latitude = latitude
+        self.longitude = longitude
+        self.weatherLatitude = weatherLatitude ?? latitude
+        self.weatherLongitude = weatherLongitude ?? longitude
+        self.coordinateSystem = coordinateSystem
+        self.timezone = timezone
+        self.source = source
+        self.sourceId = sourceId
+        self.resultType = resultType
+        self.category = category
+    }
     
     var displayTitle: String {
         nonEmpty(localizedName)
@@ -76,7 +142,12 @@ struct LocationSearchResult {
     }
     
     var displaySubtitle: String {
-        Self.joinDisplayParts(administrativeParts)
+        let locationText = Self.joinDisplayParts(administrativeParts + [nonEmpty(address)])
+        let category = displayCategory
+        if !locationText.isEmpty, let category = category {
+            return "\(locationText) · \(category)"
+        }
+        return locationText.isEmpty ? (category ?? "") : locationText
     }
     
     var searchableText: String {
@@ -88,18 +159,21 @@ struct LocationSearchResult {
             admin1,
             admin2,
             admin3,
-            admin4
+            admin4,
+            township,
+            address,
+            category
         ]
             .compactMap { nonEmpty($0)?.lowercased() }
             .joined(separator: " ")
     }
     
     func toLocation(weatherSource: WeatherSource = .openMeteo) -> Location? {
-        guard latitude.isFinite, longitude.isFinite else {
+        guard weatherLatitude.isFinite, weatherLongitude.isFinite else {
             return nil
         }
-        guard (-90.0 ... 90.0).contains(latitude),
-              (-180.0 ... 180.0).contains(longitude) else {
+        guard (-90.0 ... 90.0).contains(weatherLatitude),
+              (-180.0 ... 180.0).contains(weatherLongitude) else {
             return nil
         }
         
@@ -109,11 +183,11 @@ struct LocationSearchResult {
         
         let location = Location(
             cityId: sourceId ?? OpenMeteoConvert.stableCityId(
-                latitude: latitude,
-                longitude: longitude
+                latitude: weatherLatitude,
+                longitude: weatherLongitude
             ),
-            latitude: latitude,
-            longitude: longitude,
+            latitude: weatherLatitude,
+            longitude: weatherLongitude,
             timezone: TimeZone(identifier: timezone ?? "") ?? TimeZone.current,
             country: nonEmpty(country) ?? "",
             province: province,
@@ -127,7 +201,7 @@ struct LocationSearchResult {
         
         saveLocationDetailText(
             location: location,
-            detail: Self.joinDisplayParts(administrativeParts)
+            detail: Self.joinDisplayParts(administrativeParts + [nonEmpty(address)])
         )
         saveLocationSearchDisplayText(
             location: location,
@@ -158,9 +232,13 @@ struct LocationSearchResult {
             admin4: nonEmpty(result.admin4),
             latitude: latitude,
             longitude: longitude,
+            weatherLatitude: latitude,
+            weatherLongitude: longitude,
+            coordinateSystem: .wgs84,
             timezone: nonEmpty(result.timezone),
             source: .remoteGeocoding,
-            sourceId: result.id.map { String($0) }
+            sourceId: result.id.map { String($0) },
+            resultType: .city
         )
     }
     
@@ -186,11 +264,17 @@ struct LocationSearchResult {
             admin2: nonEmpty(placemark.subAdministrativeArea),
             admin3: nonEmpty(placemark.locality),
             admin4: nonEmpty(placemark.subLocality),
+            township: nil,
+            address: nonEmpty(placemark.thoroughfare),
             latitude: coordinate.latitude,
             longitude: coordinate.longitude,
+            weatherLatitude: coordinate.latitude,
+            weatherLongitude: coordinate.longitude,
+            coordinateSystem: .wgs84,
             timezone: placemark.timeZone?.identifier,
             source: .systemGeocoder,
-            sourceId: nil
+            sourceId: nil,
+            resultType: .address
         )
     }
     
@@ -208,7 +292,7 @@ struct LocationSearchResult {
     
     private var administrativeDistrict: String {
         let city = administrativeCity
-        let district = nonEmpty(admin4)
+        let district = nonEmpty(admin4) ?? nonEmpty(township)
         return district != city ? (district ?? "") : ""
     }
     
@@ -217,16 +301,46 @@ struct LocationSearchResult {
             nonEmpty(admin1),
             nonEmpty(admin2),
             nonEmpty(admin3),
-            nonEmpty(admin4)
+            nonEmpty(admin4),
+            nonEmpty(township)
         ]
     }
     
     fileprivate var administrativeQuality: Int {
         var quality = administrativeParts.compactMap { $0 }.count
+        if nonEmpty(address) != nil {
+            quality += 1
+        }
+        if resultType == .poi {
+            quality += 1
+        }
         if source == .systemGeocoder {
             quality += 1
         }
+        if source == .amap {
+            quality += 2
+        }
         return quality
+    }
+    
+    private var displayCategory: String? {
+        if let category = nonEmpty(category) {
+            return category
+        }
+        switch resultType {
+        case .city:
+            return "城市"
+        case .district:
+            return "区县"
+        case .township:
+            return "街道"
+        case .poi:
+            return "地点"
+        case .address:
+            return "地址"
+        case .unknown:
+            return nil
+        }
     }
     
     private static func joinDisplayParts(_ parts: [String?]) -> String {
@@ -293,11 +407,18 @@ final class InMemoryLocationSearchCache: LocationSearchCache {
                 admin2: result.admin2,
                 admin3: result.admin3,
                 admin4: result.admin4,
+                township: result.township,
+                address: result.address,
                 latitude: result.latitude,
                 longitude: result.longitude,
+                weatherLatitude: result.weatherLatitude,
+                weatherLongitude: result.weatherLongitude,
+                coordinateSystem: result.coordinateSystem,
                 timezone: result.timezone,
                 source: .localCache,
-                sourceId: result.sourceId
+                sourceId: result.sourceId,
+                resultType: result.resultType,
+                category: result.category
             )
         }
     }
@@ -436,17 +557,20 @@ final class LocalCacheLocationSearchProvider: LocationSearchProvider {
 final class LocationSearchCoordinator {
     
     private let remoteProvider: LocationSearchProvider
+    private let amapProvider: LocationSearchProvider
     private let appleProvider: LocationSearchProvider
     private let localProvider: LocationSearchProvider
     private let cache: LocationSearchCache
     
     init(
         remoteProvider: LocationSearchProvider,
+        amapProvider: LocationSearchProvider,
         appleProvider: LocationSearchProvider,
         localProvider: LocationSearchProvider,
         cache: LocationSearchCache
     ) {
         self.remoteProvider = remoteProvider
+        self.amapProvider = amapProvider
         self.appleProvider = appleProvider
         self.localProvider = localProvider
         self.cache = cache
@@ -465,27 +589,35 @@ final class LocationSearchCoordinator {
                 return
             }
             
-            self.remoteProvider.search(query: query) { [weak self] remoteResults in
+            self.amapProvider.search(query: query) { [weak self] amapResults in
                 guard let self = self else {
-                    completion(Self.deduplicate(localResults + remoteResults))
+                    completion(Self.deduplicate(localResults + amapResults))
                     return
                 }
                 
-                let merged = Self.deduplicate(localResults + remoteResults)
-                if !merged.isEmpty, !Self.shouldTrySystemGeocoder(query: query) {
-                    let sorted = Self.sorted(merged, query: query)
+                let firstMerged = Self.deduplicate(localResults + amapResults)
+                if Self.hasPreciseAmapResult(firstMerged, query: query) {
+                    let sorted = Self.sorted(firstMerged, query: query)
                     self.cache.save(results: sorted, for: query.trimmed)
                     completion(sorted)
                     return
                 }
                 
-                self.appleProvider.search(query: query) { appleResults in
-                    let sorted = Self.sorted(
-                        Self.deduplicate(merged + appleResults),
-                        query: query
-                    )
-                    self.cache.save(results: sorted, for: query.trimmed)
-                    completion(sorted)
+                self.appleProvider.search(query: query) { [weak self] appleResults in
+                    guard let self = self else {
+                        completion(Self.deduplicate(firstMerged + appleResults))
+                        return
+                    }
+                    
+                    let secondMerged = Self.deduplicate(firstMerged + appleResults)
+                    self.remoteProvider.search(query: query) { remoteResults in
+                        let sorted = Self.sorted(
+                            Self.deduplicate(secondMerged + remoteResults),
+                            query: query
+                        )
+                        self.cache.save(results: sorted, for: query.trimmed)
+                        completion(sorted)
+                    }
                 }
             }
         }
@@ -493,6 +625,7 @@ final class LocationSearchCoordinator {
     
     func cancel() {
         remoteProvider.cancel()
+        amapProvider.cancel()
         appleProvider.cancel()
         localProvider.cancel()
     }
@@ -501,9 +634,9 @@ final class LocationSearchCoordinator {
         var unique = [LocationSearchResult]()
         for result in results {
             if let index = unique.firstIndex(where: { item in
-                abs(item.latitude - result.latitude) < 0.02
-                && abs(item.longitude - result.longitude) < 0.02
+                distanceMeters(item, result) < 1000.0
                 && namesClose(item.displayTitle, result.displayTitle)
+                && sameAdministrativeArea(item, result)
             }) {
                 if result.administrativeQuality > unique[index].administrativeQuality {
                     unique[index] = result
@@ -536,23 +669,50 @@ final class LocationSearchCoordinator {
         if text.contains(query.lowercased) {
             score += 20
         }
-        if result.source == .localCache {
-            score += 10
-        }
-        if result.source == .remoteGeocoding {
+        switch result.source {
+        case .localCache:
+            score += 40
+        case .amap:
+            score += result.resultType == .poi ? 35 : 30
+        case .systemGeocoder:
+            score += 15
+        case .remoteGeocoding:
             score += 5
         }
         score += result.administrativeQuality * 5
         return score
     }
     
-    private static func shouldTrySystemGeocoder(query: LocationSearchQuery) -> Bool {
-        return query.isChinese || query.trimmed.count >= 3
+    private static func hasPreciseAmapResult(_ results: [LocationSearchResult], query: LocationSearchQuery) -> Bool {
+        return results.contains { result in
+            result.source == .amap
+            && (result.resultType == .poi || result.resultType == .township || result.resultType == .address)
+            && result.searchableText.contains(query.lowercased)
+        }
     }
     
     private static func namesClose(_ left: String, _ right: String) -> Bool {
         let left = left.lowercased()
         let right = right.lowercased()
         return left == right || left.contains(right) || right.contains(left)
+    }
+    
+    private static func sameAdministrativeArea(_ left: LocationSearchResult, _ right: LocationSearchResult) -> Bool {
+        let leftParts = [left.admin1, left.admin2, left.admin3, left.admin4].compactMap { nonEmpty($0) }
+        let rightParts = [right.admin1, right.admin2, right.admin3, right.admin4].compactMap { nonEmpty($0) }
+        guard !leftParts.isEmpty, !rightParts.isEmpty else {
+            return true
+        }
+        return leftParts.contains { rightParts.contains($0) }
+    }
+    
+    private static func distanceMeters(_ left: LocationSearchResult, _ right: LocationSearchResult) -> Double {
+        let lat1 = left.weatherLatitude * Double.pi / 180.0
+        let lat2 = right.weatherLatitude * Double.pi / 180.0
+        let dLat = lat2 - lat1
+        let dLon = (right.weatherLongitude - left.weatherLongitude) * Double.pi / 180.0
+        let a = sin(dLat / 2.0) * sin(dLat / 2.0)
+            + cos(lat1) * cos(lat2) * sin(dLon / 2.0) * sin(dLon / 2.0)
+        return 6371000.0 * 2.0 * atan2(sqrt(a), sqrt(1.0 - a))
     }
 }

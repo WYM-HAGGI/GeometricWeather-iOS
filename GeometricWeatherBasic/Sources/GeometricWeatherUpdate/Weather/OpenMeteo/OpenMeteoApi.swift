@@ -15,6 +15,7 @@ public final class OpenMeteoApi: WeatherApi {
     private let reverseGeocoder = CLGeocoder()
     private lazy var searchCoordinator = LocationSearchCoordinator(
         remoteProvider: OpenMeteoLocationSearchProvider(service: service),
+        amapProvider: AmapLocationSearchProvider(),
         appleProvider: AppleGeocoderLocationSearchProvider(),
         localProvider: LocalCacheLocationSearchProvider(cache: InMemoryLocationSearchCache.shared),
         cache: InMemoryLocationSearchCache.shared

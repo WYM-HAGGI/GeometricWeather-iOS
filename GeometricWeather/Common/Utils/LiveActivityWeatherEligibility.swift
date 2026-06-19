@@ -15,7 +15,7 @@ enum LiveActivityReason {
 }
 
 struct LiveActivityWeatherEligibility {
-    
+
     // Verification cases for a future test target:
     // clear/cloudy/fog + precipitation 0 => nil
     // drizzle/light rain + precipitation 0 => nil
@@ -24,17 +24,11 @@ struct LiveActivityWeatherEligibility {
     // minutely value >= 0.3 mm/h in the next 60 minutes => .precipitation
     // thunderstorm/hail/heavy snow => .severeWeather
     // recent alert => .alert, old alert => nil
-    private enum Threshold {
-        static let precipitationMmPerHour = 0.3
-        static let lookaheadMinutes = 60
-        static let hourlyLookaheadHours = 2
-    }
-    
     static func reason(for location: Location) -> LiveActivityReason? {
         guard let weather = location.weather else {
             return nil
         }
-        
+
         if hasValidAlert(weather.alerts) {
             return .alert
         }
@@ -48,7 +42,7 @@ struct LiveActivityWeatherEligibility {
         }
         return nil
     }
-    
+
     static func reason(
         for location: Location,
         alertProvider: WeatherAlertProvider?
@@ -59,7 +53,7 @@ struct LiveActivityWeatherEligibility {
         guard let alertProvider = alertProvider else {
             return nil
         }
-        
+
         do {
             let alerts = try await alertProvider.fetchAlerts(for: location)
             return hasValidAlert(alerts) ? .alert : nil
@@ -71,53 +65,53 @@ struct LiveActivityWeatherEligibility {
             return nil
         }
     }
-    
+
     static func fallbackMinutely(for location: Location) -> Minutely {
         let beginTime = Date().timeIntervalSince1970
         return Minutely(
             beginTime: beginTime,
-            endTime: beginTime + TimeInterval(Threshold.lookaheadMinutes * 60),
+            endTime: beginTime + TimeInterval(WeatherEventThresholds.minutelyLookaheadMinutes * 60),
             precipitationIntensities: [0.0, 0.0]
         )
     }
-    
+
     private static func hasValidAlert(_ alerts: [WeatherAlert]) -> Bool {
         return alerts.contains { alert in
             WeatherAlertValidation.isLiveActivityEligible(alert)
         }
     }
-    
+
     private static func hasCurrentPrecipitation(_ current: Current) -> Bool {
         guard isPrecipitationWeatherCode(current.weatherCode),
               !isSevere(current.weatherCode) else {
             return false
         }
-        return (current.precipitationIntensity ?? 0.0) >= Threshold.precipitationMmPerHour
+        return (current.precipitationIntensity ?? 0.0) >= WeatherEventThresholds.precipitationMmPerHour
     }
-    
+
     private static func hasUpcomingMinutelyPrecipitation(_ minutely: Minutely?) -> Bool {
         guard let minutely = minutely else {
             return false
         }
-        
+
         let duration = max(minutely.endTime - minutely.beginTime, 1.0)
         let secondsPerItem = duration / Double(max(minutely.precipitationIntensities.count - 1, 1))
         let maxCount = min(
             minutely.precipitationIntensities.count,
-            Int(ceil(TimeInterval(Threshold.lookaheadMinutes * 60) / secondsPerItem)) + 1
+            Int(ceil(TimeInterval(WeatherEventThresholds.minutelyLookaheadMinutes * 60) / secondsPerItem)) + 1
         )
-        
+
         // Open-Meteo minutely_15 is converted to project precipitation intensity in mm/h
         // in OpenMeteoConvert before creating Minutely. Other providers should also store
         // Minutely.precipitationIntensities as mm/h.
         return minutely.precipitationIntensities.prefix(maxCount).contains { intensity in
-            intensity >= Threshold.precipitationMmPerHour
+            intensity >= WeatherEventThresholds.precipitationMmPerHour
         }
     }
-    
+
     private static func hasUpcomingHourlyPrecipitation(_ hourlies: [Hourly]) -> Bool {
         let now = Date().timeIntervalSince1970
-        let deadline = now + TimeInterval(Threshold.hourlyLookaheadHours * 60 * 60)
+        let deadline = now + TimeInterval(WeatherEventThresholds.hourlyLookaheadHours * 60 * 60)
         return hourlies.contains { hourly in
             guard now <= hourly.time && hourly.time <= deadline,
                   isPrecipitationWeatherCode(hourly.weatherCode),
@@ -126,18 +120,18 @@ struct LiveActivityWeatherEligibility {
             }
             // Hourly precipitation from Open-Meteo represents hourly accumulation in mm,
             // equivalent to average mm/h across that hour for eligibility purposes.
-            return (hourly.precipitationIntensity ?? 0.0) >= Threshold.precipitationMmPerHour
+            return (hourly.precipitationIntensity ?? 0.0) >= WeatherEventThresholds.precipitationMmPerHour
         }
     }
-    
+
     private static func hasSevereHourlyWeather(_ hourlies: [Hourly]) -> Bool {
         let now = Date().timeIntervalSince1970
-        let deadline = now + TimeInterval(Threshold.hourlyLookaheadHours * 60 * 60)
+        let deadline = now + TimeInterval(WeatherEventThresholds.hourlyLookaheadHours * 60 * 60)
         return hourlies.contains { hourly in
             now <= hourly.time && hourly.time <= deadline && isSevere(hourly.weatherCode)
         }
     }
-    
+
     private static func isSevere(_ weatherCode: WeatherCode) -> Bool {
         switch weatherCode {
         case .thunderstorm, .hail, .sleet(_):

@@ -103,6 +103,8 @@
 "weather_dust" = "浮尘";
 "weather_sand" = "沙尘";
 "weather_wind" = "大风";
+"weather_thunder" = "雷电";
+"weather_thunderstorm" = "雷暴";
 
 "wind_0" = "无风";
 "wind_1" = "一级";
@@ -165,6 +167,16 @@
 "hourly_overview" = "小时概览";
 "minutely_overview" = "分钟概览";
 "precipitation_overview" = "降水预报";
+"hourly_notice_precipitation_title" = "即将有降水";
+"hourly_notice_thunderstorm_title" = "雷暴天气";
+"hourly_notice_wind_title" = "大风提醒";
+"hourly_notice_weather_alert_title" = "天气预警";
+"hourly_notice_severe_weather_title" = "强天气提醒";
+"hourly_notice_precipitation_subtitle" = "未来 60 分钟可能出现降水，请留意出行。";
+"hourly_notice_thunderstorm_subtitle" = "未来短时可能出现雷暴，请注意安全。";
+"hourly_notice_wind_subtitle" = "未来短时风力较大，请注意户外安全。";
+"hourly_notice_weather_alert_subtitle" = "当前地区存在有效天气预警。";
+"hourly_notice_severe_weather_subtitle" = "未来短时可能出现强降水或恶劣天气。";
 "air_quality" = "空气质量";
 "allergen" = "过敏原";
 "life_details" = "详情数据";

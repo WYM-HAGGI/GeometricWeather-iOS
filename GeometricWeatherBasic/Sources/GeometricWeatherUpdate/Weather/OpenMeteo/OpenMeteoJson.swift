@@ -8,12 +8,12 @@
 import Foundation
 
 struct OpenMeteoTime: Codable {
-    
+
     let value: TimeInterval?
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        
+
         if let doubleValue = try? container.decode(Double.self) {
             self.value = doubleValue
             return
@@ -27,7 +27,7 @@ struct OpenMeteoTime: Codable {
                 self.value = doubleValue
                 return
             }
-            
+
             let isoFormatter = ISO8601DateFormatter()
             isoFormatter.formatOptions = [
                 .withInternetDateTime,
@@ -37,20 +37,20 @@ struct OpenMeteoTime: Codable {
                 self.value = date.timeIntervalSince1970
                 return
             }
-            
+
             let fallbackFormatter = ISO8601DateFormatter()
             if let date = fallbackFormatter.date(from: stringValue) {
                 self.value = date.timeIntervalSince1970
                 return
             }
-            
+
             self.value = nil
             return
         }
-        
+
         self.value = nil
     }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(value)
@@ -62,7 +62,7 @@ struct OpenMeteoGeocodingResponse: Codable {
     let generationtimeMs: Double?
     let error: Bool?
     let reason: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case results
         case generationtimeMs = "generationtime_ms"
@@ -84,7 +84,7 @@ struct OpenMeteoLocationResult: Codable {
     let admin2: String?
     let admin3: String?
     let admin4: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case name
@@ -105,17 +105,19 @@ struct OpenMeteoForecastResponse: Codable {
     let latitude: Double?
     let longitude: Double?
     let timezone: String?
+    let utcOffsetSeconds: Int?
     let current: OpenMeteoCurrent?
     let hourly: OpenMeteoHourly?
     let daily: OpenMeteoDaily?
     let minutely15: OpenMeteoMinutely?
     let error: Bool?
     let reason: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case latitude
         case longitude
         case timezone
+        case utcOffsetSeconds = "utc_offset_seconds"
         case current
         case hourly
         case daily
@@ -143,7 +145,7 @@ struct OpenMeteoCurrent: Codable {
     let windSpeed10m: Double?
     let windDirection10m: Double?
     let windGusts10m: Double?
-    
+
     enum CodingKeys: String, CodingKey {
         case time
         case interval
@@ -186,7 +188,7 @@ struct OpenMeteoHourly: Codable {
     let windGusts10m: [Double?]?
     let uvIndex: [Double?]?
     let isDay: [Int?]?
-    
+
     enum CodingKeys: String, CodingKey {
         case time
         case temperature2m = "temperature_2m"
@@ -231,7 +233,7 @@ struct OpenMeteoDaily: Codable {
     let windSpeed10mMax: [Double?]?
     let windGusts10mMax: [Double?]?
     let windDirection10mDominant: [Double?]?
-    
+
     enum CodingKeys: String, CodingKey {
         case time
         case weatherCode = "weather_code"
@@ -261,9 +263,17 @@ struct OpenMeteoMinutely: Codable {
 }
 
 struct OpenMeteoAirQualityResponse: Codable {
+    let utcOffsetSeconds: Int?
     let hourly: OpenMeteoAirQualityHourly?
     let error: Bool?
     let reason: String?
+
+    enum CodingKeys: String, CodingKey {
+        case utcOffsetSeconds = "utc_offset_seconds"
+        case hourly
+        case error
+        case reason
+    }
 }
 
 struct OpenMeteoAirQualityHourly: Codable {
@@ -274,7 +284,7 @@ struct OpenMeteoAirQualityHourly: Codable {
     let nitrogenDioxide: [Double?]?
     let sulphurDioxide: [Double?]?
     let ozone: [Double?]?
-    
+
     enum CodingKeys: String, CodingKey {
         case time
         case pm10

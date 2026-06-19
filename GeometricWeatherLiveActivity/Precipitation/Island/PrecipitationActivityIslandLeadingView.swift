@@ -26,7 +26,7 @@ struct PrecipitationActivityIslandLeadingView: View {
             
             if !self.inIsland {
                 VStack(alignment: .leading, spacing: 2.0) {
-                    Text(self.context.attributes.weatherText)
+                    Text(getDisplayWeatherText(self.context.attributes.weatherText))
                         .font(.caption.weight(.bold))
                     
                     HStack(alignment: .center, spacing: 4.0) {

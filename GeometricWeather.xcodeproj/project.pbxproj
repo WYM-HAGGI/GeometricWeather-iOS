@@ -43,6 +43,8 @@
 		3759512929743681002F6B22 /* GeometricWeatherBasic in Frameworks */ = {isa = PBXBuildFile; productRef = 3759512829743681002F6B22 /* GeometricWeatherBasic */; };
 		3759512B2977D9AC002F6B22 /* LiveActivityHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759512A2977D9AC002F6B22 /* LiveActivityHelper.swift */; };
 		3759513B2977F001002F6B22 /* LiveActivityWeatherEligibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759513A2977F001002F6B22 /* LiveActivityWeatherEligibility.swift */; };
+		3759513B2977F001002F6B00 /* WeatherEventThresholds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759513A2977F001002F6B00 /* WeatherEventThresholds.swift */; };
+		3759513B2977F001002F6B01 /* HourlyWeatherNoticeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759513A2977F001002F6B01 /* HourlyWeatherNoticeBuilder.swift */; };
 		3759513D2977F002002F6B22 /* WeatherAlertProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759513C2977F002002F6B22 /* WeatherAlertProvider.swift */; };
 		3759513F2977F003002F6B22 /* AirQualityProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759513E2977F003002F6B22 /* AirQualityProvider.swift */; };
 		375951412977F004002F6B22 /* DeviceBarometerProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375951402977F004002F6B22 /* DeviceBarometerProvider.swift */; };
@@ -329,6 +331,8 @@
 		37595124297435DD002F6B22 /* GeometricWeatherLiveActivityExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GeometricWeatherLiveActivityExtension.entitlements; sourceTree = "<group>"; };
 		3759512A2977D9AC002F6B22 /* LiveActivityHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityHelper.swift; sourceTree = "<group>"; };
 		3759513A2977F001002F6B22 /* LiveActivityWeatherEligibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityWeatherEligibility.swift; sourceTree = "<group>"; };
+		3759513A2977F001002F6B00 /* WeatherEventThresholds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherEventThresholds.swift; sourceTree = "<group>"; };
+		3759513A2977F001002F6B01 /* HourlyWeatherNoticeBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyWeatherNoticeBuilder.swift; sourceTree = "<group>"; };
 		3759513C2977F002002F6B22 /* WeatherAlertProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAlertProvider.swift; sourceTree = "<group>"; };
 		3759513E2977F003002F6B22 /* AirQualityProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirQualityProvider.swift; sourceTree = "<group>"; };
 		375951402977F004002F6B22 /* DeviceBarometerProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBarometerProvider.swift; sourceTree = "<group>"; };
@@ -1089,6 +1093,8 @@
 				379A8ABC27C8C59000083BFF /* AppExtensionHelper.swift */,
 				3759512A2977D9AC002F6B22 /* LiveActivityHelper.swift */,
 				3759513A2977F001002F6B22 /* LiveActivityWeatherEligibility.swift */,
+				3759513A2977F001002F6B00 /* WeatherEventThresholds.swift */,
+				3759513A2977F001002F6B01 /* HourlyWeatherNoticeBuilder.swift */,
 				3759513C2977F002002F6B22 /* WeatherAlertProvider.swift */,
 				3759513E2977F003002F6B22 /* AirQualityProvider.swift */,
 				375951402977F004002F6B22 /* DeviceBarometerProvider.swift */,
@@ -1808,6 +1814,8 @@
 				374629FF28239985009FBB85 /* CGRectExt.swift in Sources */,
 				3759512B2977D9AC002F6B22 /* LiveActivityHelper.swift in Sources */,
 				3759513B2977F001002F6B22 /* LiveActivityWeatherEligibility.swift in Sources */,
+				3759513B2977F001002F6B00 /* WeatherEventThresholds.swift in Sources */,
+				3759513B2977F001002F6B01 /* HourlyWeatherNoticeBuilder.swift in Sources */,
 				3759513D2977F002002F6B22 /* WeatherAlertProvider.swift in Sources */,
 				3759513F2977F003002F6B22 /* AirQualityProvider.swift in Sources */,
 				375951412977F004002F6B22 /* DeviceBarometerProvider.swift in Sources */,

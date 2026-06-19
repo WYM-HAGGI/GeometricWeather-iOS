@@ -95,7 +95,7 @@ class MainTableViewHeaderView: UIView, AbstractMainItem {
                 )
             )
             
-            var description = weather.current.weatherText
+            var description = getDisplayWeatherText(weather.current.weatherText)
             if let realFeelTemperature = weather.current.temperature.realFeelTemperature {
                 description = description
                 + ", "

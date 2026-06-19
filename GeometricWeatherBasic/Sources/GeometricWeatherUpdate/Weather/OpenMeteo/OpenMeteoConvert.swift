@@ -148,26 +148,38 @@ enum OpenMeteoConvert {
             return nil
         }
 
-        let hourlyAirQuality = generateHourlyAirQuality(airQuality?.hourly)
+        let forecastOffset = forecast.utcOffsetSeconds ?? 0
+        let airQualityOffset = airQuality?.utcOffsetSeconds ?? forecastOffset
+        let currentTime = correctedTime(
+            current.time?.value,
+            utcOffsetSeconds: forecastOffset
+        ) ?? Date().timeIntervalSince1970
+
+        let hourlyAirQuality = generateHourlyAirQuality(
+            airQuality?.hourly,
+            utcOffsetSeconds: airQualityOffset
+        )
         let currentAirQuality = nearestAirQuality(
             hourlyAirQuality,
-            to: current.time?.value ?? Date().timeIntervalSince1970
+            to: currentTime
         )
 
         let hourlies = generateHourlyList(
             hourly: forecast.hourly,
-            hourlyAirQuality: hourlyAirQuality
+            hourlyAirQuality: hourlyAirQuality,
+            utcOffsetSeconds: forecastOffset
         )
         let dailies = generateDailyList(
             daily: forecast.daily,
             hourlies: hourlies,
-            timezone: TimeZone(identifier: forecast.timezone ?? "") ?? location.timezone
+            timezone: TimeZone(identifier: forecast.timezone ?? "") ?? location.timezone,
+            utcOffsetSeconds: forecastOffset
         )
 
         return Weather(
             base: Base(
                 cityId: location.cityId,
-                timeStamp: current.time?.value ?? Date().timeIntervalSince1970
+                timeStamp: Date().timeIntervalSince1970
             ),
             current: Current(
                 weatherText: OpenMeteoIconMapper.weatherText(from: current.weatherCode),
@@ -201,14 +213,18 @@ enum OpenMeteoConvert {
             yesterday: nil,
             dailyForecasts: dailies,
             hourlyForecasts: hourlies,
-            minutelyForecast: generateMinutely(forecast.minutely15),
+            minutelyForecast: generateMinutely(
+                forecast.minutely15,
+                utcOffsetSeconds: forecastOffset
+            ),
             alerts: []
         )
     }
 
     private static func generateHourlyList(
         hourly: OpenMeteoHourly?,
-        hourlyAirQuality: [TimeInterval: AirQuality]
+        hourlyAirQuality: [TimeInterval: AirQuality],
+        utcOffsetSeconds: Int
     ) -> [Hourly] {
         guard let time = hourly?.time else {
             return []
@@ -217,7 +233,10 @@ enum OpenMeteoConvert {
         let maxCount = min(time.count, 72)
         var result = [Hourly]()
         for index in 0 ..< maxCount {
-            guard let timestamp = time.get(index)?.value else {
+            guard let timestamp = correctedTime(
+                time.get(index)?.value,
+                utcOffsetSeconds: utcOffsetSeconds
+            ) else {
                 continue
             }
 
@@ -254,7 +273,8 @@ enum OpenMeteoConvert {
     private static func generateDailyList(
         daily: OpenMeteoDaily?,
         hourlies: [Hourly],
-        timezone: TimeZone
+        timezone: TimeZone,
+        utcOffsetSeconds: Int
     ) -> [Daily] {
         guard let time = daily?.time else {
             return []
@@ -263,7 +283,10 @@ enum OpenMeteoConvert {
         let maxCount = min(time.count, 15)
         var result = [Daily]()
         for index in 0 ..< maxCount {
-            guard let timestamp = time.get(index)?.value else {
+            guard let timestamp = correctedTime(
+                time.get(index)?.value,
+                utcOffsetSeconds: utcOffsetSeconds
+            ) else {
                 continue
             }
 
@@ -318,8 +341,14 @@ enum OpenMeteoConvert {
                         humidity: average(dayHourly.compactMap { $0.humidity })
                     ),
                     sun: Astro(
-                        riseTime: daily?.sunrise?.get(index)?.value,
-                        setTime: daily?.sunset?.get(index)?.value
+                        riseTime: correctedTime(
+                            daily?.sunrise?.get(index)?.value,
+                            utcOffsetSeconds: utcOffsetSeconds
+                        ),
+                        setTime: correctedTime(
+                            daily?.sunset?.get(index)?.value,
+                            utcOffsetSeconds: utcOffsetSeconds
+                        )
                     ),
                     moon: Astro(
                         riseTime: nil,
@@ -348,11 +377,20 @@ enum OpenMeteoConvert {
         return result
     }
 
-    private static func generateMinutely(_ minutely: OpenMeteoMinutely?) -> Minutely? {
+    private static func generateMinutely(
+        _ minutely: OpenMeteoMinutely?,
+        utcOffsetSeconds: Int
+    ) -> Minutely? {
         guard
             let times = minutely?.time,
-            let first = times.first?.value,
-            let last = times.last?.value
+            let first = correctedTime(
+                times.first?.value,
+                utcOffsetSeconds: utcOffsetSeconds
+            ),
+            let last = correctedTime(
+                times.last?.value,
+                utcOffsetSeconds: utcOffsetSeconds
+            )
         else {
             return nil
         }
@@ -371,14 +409,20 @@ enum OpenMeteoConvert {
         )
     }
 
-    private static func generateHourlyAirQuality(_ hourly: OpenMeteoAirQualityHourly?) -> [TimeInterval: AirQuality] {
+    private static func generateHourlyAirQuality(
+        _ hourly: OpenMeteoAirQualityHourly?,
+        utcOffsetSeconds: Int
+    ) -> [TimeInterval: AirQuality] {
         guard let times = hourly?.time else {
             return [:]
         }
 
         var result = [TimeInterval: AirQuality]()
         for index in 0 ..< times.count {
-            guard let time = times.get(index)?.value else {
+            guard let time = correctedTime(
+                times.get(index)?.value,
+                utcOffsetSeconds: utcOffsetSeconds
+            ) else {
                 continue
             }
             let pm25 = hourly?.pm25?.get(index) ?? nil
@@ -489,6 +533,16 @@ enum OpenMeteoConvert {
                 inSameDayAs: dayDate
             )
         }
+    }
+
+    private static func correctedTime(
+        _ value: TimeInterval?,
+        utcOffsetSeconds: Int
+    ) -> TimeInterval? {
+        guard let value = value else {
+            return nil
+        }
+        return value - TimeInterval(utcOffsetSeconds)
     }
 
     private static func generateMoonPhase(for timestamp: TimeInterval) -> MoonPhase {

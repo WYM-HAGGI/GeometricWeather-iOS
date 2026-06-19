@@ -34,6 +34,9 @@ class MainTrendShaderCollectionView: UICollectionView {
     }
     
     var highlightIndex: Int {
+        guard self.numberOfItems(inSection: 0) > 0 else {
+            return 0
+        }
         let rtlCenterX = self.isRtl
         ? (self.contentSize.width - self.scrollBar.center.x)
         : self.scrollBar.center.x
@@ -69,10 +72,17 @@ class MainTrendShaderCollectionView: UICollectionView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
+        let maxOffsetX = max(0.0, self.contentSize.width - self.frame.width)
+        let x: CGFloat
+        if maxOffsetX == 0.0 {
+            x = self.contentOffset.x
+        } else {
+            x = (self.frame.width - self.cellSize.width)
+                * self.contentOffset.x / maxOffsetX
+                + self.contentOffset.x
+        }
         self.scrollBar.frame = CGRect(
-            x: (self.frame.width - self.cellSize.width)
-            * self.contentOffset.x / (self.contentSize.width - self.frame.width)
-            + self.contentOffset.x,
+            x: x,
             y: 0.0,
             width: self.cellSize.width,
             height: self.frame.height

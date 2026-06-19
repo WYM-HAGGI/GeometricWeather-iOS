@@ -36,7 +36,7 @@ struct WeatherWidgetSmallView: View {
     
     private func getBottomBodyText() -> String {
         if let weather = location.weather {
-            return weather.current.weatherText
+            return getDisplayWeatherText(weather.current.weatherText)
         }
         return "--"
     }

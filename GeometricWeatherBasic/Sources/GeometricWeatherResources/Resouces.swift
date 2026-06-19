@@ -148,13 +148,28 @@ public func getLocalizedText(_ key: String) -> String {
         comment: ""
     )
     
-    return NSLocalizedString(
+    let localized = NSLocalizedString(
         key,
         tableName: nil,
         bundle: .shared,
         value: defaultValue,
         comment: ""
     )
+    if localized == key || localized.isEmpty {
+        return key
+            .replacingOccurrences(of: "openmeteo_weather_", with: "")
+            .replacingOccurrences(of: "weather_", with: "")
+            .replacingOccurrences(of: "_", with: " ")
+            .capitalized
+    }
+    return localized
+}
+
+public func getDisplayWeatherText(_ text: String) -> String {
+    if text.hasPrefix("weather_") || text.hasPrefix("openmeteo_weather_") {
+        return getLocalizedText(text)
+    }
+    return text
 }
 
 public func locationHasResolvedAddress(_ location: Location) -> Bool {
@@ -303,13 +318,19 @@ public func getWeekText(_ daily: Daily) -> String {
     return getLocalizedText("week_\(daily.week)")
 }
 
-public func getHourText(_ hourly: Hourly) -> String {
+public func getHourText(_ hourly: Hourly, timezone: TimeZone = .current) -> String {
     if isTwelveHour() {
         let formatter = DateFormatter()
         formatter.dateFormat = "h aa"
+        formatter.timeZone = timezone
         return formatter.string(from: Date(timeIntervalSince1970: hourly.time))
     } else {
-        return String(hourly.getHour(inTwelveHourFormat: false)) + getLocalizedText("of_clock")
+        return String(
+            hourly.getHour(
+                inTwelveHourFormat: false,
+                timezone: timezone
+            )
+        ) + getLocalizedText("of_clock")
     }
 }
 

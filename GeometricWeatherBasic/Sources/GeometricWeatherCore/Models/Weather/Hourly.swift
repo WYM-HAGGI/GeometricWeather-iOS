@@ -56,8 +56,13 @@ public struct Hourly: Codable {
         self.humidity = humidity
     }
 
-    public func getHour(inTwelveHourFormat twelveHour: Bool) -> Int {
-        var hour = Calendar.current.component(
+    public func getHour(
+        inTwelveHourFormat twelveHour: Bool,
+        timezone: TimeZone = .current
+    ) -> Int {
+        var calendar = Calendar.current
+        calendar.timeZone = timezone
+        var hour = calendar.component(
             .hour,
             from: Date(timeIntervalSince1970: time)
         )
@@ -70,9 +75,13 @@ public struct Hourly: Codable {
         return hour
     }
     
-    public func formatDate(format: String) -> String {
+    public func formatDate(
+        format: String,
+        timezone: TimeZone = .current
+    ) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = format
+        formatter.timeZone = timezone
         return formatter.string(from: Date(timeIntervalSince1970: time))
     }
 }

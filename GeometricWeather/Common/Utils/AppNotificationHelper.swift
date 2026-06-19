@@ -98,7 +98,7 @@ func resetTodayForecastPendingNotification(weather: Weather) {
     content.title = getLocalizedText("today")
     content.body = getLocalizedText("daytime")
     + " "
-    + weather.dailyForecasts[0].day.weatherText
+    + getDisplayWeatherText(weather.dailyForecasts[0].day.weatherText)
     + " "
     + unit.formatValueWithUnit(
         weather.dailyForecasts[0].day.temperature.temperature,
@@ -107,7 +107,7 @@ func resetTodayForecastPendingNotification(weather: Weather) {
     + "\n"
     + getLocalizedText("nighttime")
     + " "
-    + weather.dailyForecasts[0].night.weatherText
+    + getDisplayWeatherText(weather.dailyForecasts[0].night.weatherText)
     + " "
     + unit.formatValueWithUnit(
         weather.dailyForecasts[0].night.temperature.temperature,
@@ -148,7 +148,7 @@ func resetTomorrowForecastPendingNotification(weather: Weather) {
     content.title = getLocalizedText("tomorrow")
     content.body = getLocalizedText("daytime")
     + " "
-    + weather.dailyForecasts[1].day.weatherText
+    + getDisplayWeatherText(weather.dailyForecasts[1].day.weatherText)
     + " "
     + unit.formatValueWithUnit(
         weather.dailyForecasts[1].day.temperature.temperature,
@@ -157,7 +157,7 @@ func resetTomorrowForecastPendingNotification(weather: Weather) {
     + "\n"
     + getLocalizedText("nighttime")
     + " "
-    + weather.dailyForecasts[1].night.weatherText
+    + getDisplayWeatherText(weather.dailyForecasts[1].night.weatherText)
     + " "
     + unit.formatValueWithUnit(
         weather.dailyForecasts[1].night.temperature.temperature,

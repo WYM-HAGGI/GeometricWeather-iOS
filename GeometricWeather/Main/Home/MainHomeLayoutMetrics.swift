@@ -10,10 +10,10 @@ import UIKit
 enum MainHomeLayoutMetrics {
     static func firstCardTopRatio(for bounds: CGRect) -> CGFloat {
         let height = bounds.height
-        if height <= 760.0 {
+        if height <= 800.0 {
             return 0.56
         }
-        if height <= 880.0 {
+        if height <= 920.0 {
             return 0.59
         }
         return 0.60

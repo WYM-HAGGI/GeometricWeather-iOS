@@ -34,6 +34,11 @@ class MainHourlyCardCell: MainTableViewCell,
     private let vstack = UIStackView(frame: .zero)
 
     private let summaryLabel = UILabel(frame: .zero)
+    private let noticeContainer = UIView(frame: .zero)
+    private let noticeTextStack = UIStackView(frame: .zero)
+    private let noticeTitleLabel = UILabel(frame: .zero)
+    private let noticeSubtitleLabel = UILabel(frame: .zero)
+    private let noticeSeparator = UIView(frame: .zero)
 
     private let tagPaddingTop = UIView(frame: .zero)
     private let hourlyTagView = MainSelectableTagView(frame: .zero)
@@ -62,6 +67,7 @@ class MainHourlyCardCell: MainTableViewCell,
     private var isSyncScrollingEnabled = false
     private var lastBoundLocationId: String?
     private var hasUserScrolledHourlyCollectionView = false
+    private var hasLoggedHourlyAlignmentDebug = false
 
     // MARK: - life cycle.
 
@@ -81,6 +87,41 @@ class MainHourlyCardCell: MainTableViewCell,
         self.summaryLabel.lineBreakMode = .byWordWrapping
         self.vstack.addArrangedSubview(self.summaryLabel)
 
+        self.noticeContainer.backgroundColor = .secondarySystemFill
+        self.noticeContainer.layer.cornerRadius = 8.0
+        self.noticeContainer.layer.masksToBounds = true
+        self.noticeContainer.isHidden = true
+        self.vstack.addArrangedSubview(self.noticeContainer)
+
+        self.noticeTextStack.axis = .vertical
+        self.noticeTextStack.alignment = .fill
+        self.noticeTextStack.spacing = 2.0
+        self.noticeContainer.addSubview(self.noticeTextStack)
+
+        self.noticeTitleLabel.font = .systemFont(ofSize: miniCaptionFont.pointSize, weight: .bold)
+        self.noticeTitleLabel.textColor = .label
+        self.noticeTitleLabel.numberOfLines = 1
+        self.noticeTextStack.addArrangedSubview(self.noticeTitleLabel)
+
+        self.noticeSubtitleLabel.font = tinyCaptionFont
+        self.noticeSubtitleLabel.textColor = .secondaryLabel
+        self.noticeSubtitleLabel.numberOfLines = 2
+        self.noticeSubtitleLabel.lineBreakMode = .byTruncatingTail
+        self.noticeTextStack.addArrangedSubview(self.noticeSubtitleLabel)
+
+        self.noticeSeparator.backgroundColor = .separator.withAlphaComponent(0.45)
+        self.noticeSeparator.isHidden = true
+
+        self.minutelyTitle.text = getLocalizedText("precipitation_overview")
+        self.minutelyTitle.font = titleFont
+        self.minutelyTitleVibrancyContainer.contentView.addSubview(self.minutelyTitle)
+        self.minutelyTitleVibrancyContainer.isHidden = true
+        self.vstack.addArrangedSubview(self.minutelyTitleVibrancyContainer)
+
+        self.minutelyView.isHidden = true
+        self.vstack.addArrangedSubview(self.minutelyView)
+
+        self.vstack.addArrangedSubview(self.noticeSeparator)
         self.vstack.addArrangedSubview(self.tagPaddingTop)
 
         self.hourlyTagView.tagDelegate = self
@@ -98,10 +139,6 @@ class MainHourlyCardCell: MainTableViewCell,
 
         self.vstack.addArrangedSubview(self.hourlyTrendGroupView)
 
-        self.minutelyTitle.text = getLocalizedText("precipitation_overview")
-        self.minutelyTitle.font = titleFont
-        self.minutelyTitleVibrancyContainer.contentView.addSubview(self.minutelyTitle)
-
         self.titleVibrancyContainer.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(MainCardLayoutMetrics.titleTopPadding)
             make.leading.equalToSuperview().offset(normalMargin)
@@ -116,6 +153,30 @@ class MainHourlyCardCell: MainTableViewCell,
         self.summaryLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(normalMargin)
             make.trailing.equalToSuperview().offset(-normalMargin)
+        }
+        self.noticeContainer.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(normalMargin)
+            make.trailing.equalToSuperview().offset(-normalMargin)
+        }
+        self.noticeTextStack.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(littleMargin)
+            make.leading.equalToSuperview().offset(littleMargin)
+            make.trailing.equalToSuperview().offset(-littleMargin)
+            make.bottom.equalToSuperview().offset(-littleMargin)
+        }
+        self.noticeSeparator.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(normalMargin)
+            make.trailing.equalToSuperview().offset(-normalMargin)
+            make.height.equalTo(0.5)
+        }
+        self.minutelyTitleVibrancyContainer.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(normalMargin)
+            make.trailing.equalToSuperview().offset(-normalMargin)
+        }
+        self.minutelyView.snp.makeConstraints { make in
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.height.equalTo(minutelyTrendViewHeight)
         }
         self.tagPaddingTop.snp.makeConstraints { make in
             make.leading.equalToSuperview()
@@ -172,16 +233,19 @@ class MainHourlyCardCell: MainTableViewCell,
             self.lastBoundLocationId = location.formattedId
             self.hasUserScrolledHourlyCollectionView = false
             self.currentScrollDayOfYear = -1
+            self.hasLoggedHourlyAlignmentDebug = false
         }
 
-        self.minutelyTitleVibrancyContainer.removeFromSuperview()
-        self.minutelyView.removeFromSuperview()
-
         guard let weather = location.weather else {
+            self.configureNotice(nil)
+            self.configureMinutely(nil, location: location)
             return
         }
 
         self.summaryLabel.text = weather.current.hourlyForecast
+        self.summaryLabel.isHidden = (weather.current.hourlyForecast ?? "").isEmpty
+        self.configureNotice(HourlyWeatherNoticeBuilder.build(for: location, weather: weather))
+        self.configureMinutely(weather, location: location)
 
         let generators = self.ensureTrendGenerators(for: location)
         self.validTrendGenerators = generators.valid
@@ -191,61 +255,6 @@ class MainHourlyCardCell: MainTableViewCell,
 
         self.hourlyCollectionView.reloadData()
         self.alignHourlyCollectionIfNeeded(location: location)
-
-        // minutely.
-
-        guard let minutely = weather.minutelyForecast else {
-            return
-        }
-        if !minutely.isValid {
-            return
-        }
-
-        self.vstack.addArrangedSubview(self.minutelyTitleVibrancyContainer)
-        self.minutelyTitleVibrancyContainer.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(normalMargin)
-            make.trailing.equalToSuperview().offset(-normalMargin)
-        }
-
-        let color = UIColor(
-            ThemeManager.weatherThemeDelegate.getThemeColor(
-                weatherKind: weatherCodeToWeatherKind(code: weather.current.weatherCode),
-                daylight: location.isDaylight
-            )
-        )
-        self.minutelyView.polylineColor = { _ in color }
-        self.minutelyView.baselineColor = color
-        self.minutelyView.polylineTintColor = .systemBlue
-
-        let maxIntensity = minutely.precipitationIntensities.max { a, b in a < b } ?? precipitationIntensityHeavy
-        self.minutelyView.polylineValues = minutely.precipitationIntensities.map { intensity in
-            min(1.0, intensity / maxIntensity)
-        }
-        self.minutelyView.polylineDescriptionMapper = { value in
-            let unit = SettingsManager
-                .shared
-                .precipitationIntensityUnit
-            return unit.formatValueWithUnit(value * maxIntensity, unit: getLocalizedText(unit.key))
-        }
-
-        self.minutelyView.beginTime = formateTime(
-            timeIntervalSine1970: minutely.beginTime,
-            twelveHour: isTwelveHour()
-        )
-        self.minutelyView.centerTime = formateTime(
-            timeIntervalSine1970: (minutely.beginTime + minutely.endTime) / 2.0,
-            twelveHour: isTwelveHour()
-        )
-        self.minutelyView.endTime = formateTime(
-            timeIntervalSine1970: minutely.endTime,
-            twelveHour: isTwelveHour()
-        )
-        self.vstack.addArrangedSubview(self.minutelyView)
-        self.minutelyView.snp.makeConstraints { make in
-            make.leading.equalToSuperview()
-            make.trailing.equalToSuperview()
-            make.height.equalTo(minutelyTrendViewHeight)
-        }
     }
 
     override func traitCollectionDidChange(
@@ -525,16 +534,12 @@ class MainHourlyCardCell: MainTableViewCell,
 
     func onSelectedRepeatly(currentSelectedIndex: Int) {
         if self.hourlyCollectionView.indexPathsForVisibleItems.first != nil {
-            self.hourlyCollectionView.scrollToItem(
-                at: IndexPath(
-                    row: Self.currentHourlyIndex(
-                        hourly: self.location?.weather?.hourlyForecasts ?? [],
-                        now: Date(),
-                        timezone: self.location?.timezone
-                    ),
-                    section: 0
+            self.scrollHourlyCollection(
+                to: Self.currentHourlyIndex(
+                    hourly: self.location?.weather?.hourlyForecasts ?? [],
+                    now: Date(),
+                    displayTimeZone: self.location?.timezone ?? .current
                 ),
-                at: .start,
                 animated: true
             )
         }
@@ -545,7 +550,7 @@ class MainHourlyCardCell: MainTableViewCell,
         let currentIndex = Self.currentHourlyIndex(
             hourly: self.location?.weather?.hourlyForecasts ?? [],
             now: Date(),
-            timezone: self.location?.timezone
+            displayTimeZone: self.location?.timezone ?? .current
         )
         if let hourly = self.location?.weather?.hourlyForecasts.get(currentIndex),
            let dayOfYear = self.dayOfYear(
@@ -569,7 +574,12 @@ class MainHourlyCardCell: MainTableViewCell,
         let index = Self.currentHourlyIndex(
             hourly: hourly,
             now: Date(),
-            timezone: location.timezone
+            displayTimeZone: location.timezone
+        )
+        self.logHourlyAlignmentDebugIfNeeded(
+            location: location,
+            hourly: hourly,
+            index: index
         )
         DispatchQueue.main.async { [weak self] in
             guard let self = self,
@@ -581,11 +591,7 @@ class MainHourlyCardCell: MainTableViewCell,
             }
 
             self.hourlyCollectionView.layoutIfNeeded()
-            self.hourlyCollectionView.scrollToItem(
-                at: IndexPath(row: index, section: 0),
-                at: .left,
-                animated: false
-            )
+            self.scrollHourlyCollection(to: index, animated: false)
 
             if self.isSyncScrollingEnabled,
                let dayOfYear = self.dayOfYear(for: hourly[index].time, timezone: location.timezone) {
@@ -597,18 +603,150 @@ class MainHourlyCardCell: MainTableViewCell,
     static func currentHourlyIndex(
         hourly: [Hourly],
         now: Date,
-        timezone: TimeZone?
+        displayTimeZone: TimeZone = .current
     ) -> Int {
         guard !hourly.isEmpty else {
             return 0
         }
 
-        let targetTime = timezone.map { Date.now(in: $0).timeIntervalSince1970 }
-            ?? now.timeIntervalSince1970
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = displayTimeZone
+        let nowComponents = calendar.dateComponents([.year, .month, .day, .hour], from: now)
+        if let index = hourly.firstIndex(where: { item in
+            let itemComponents = calendar.dateComponents(
+                [.year, .month, .day, .hour],
+                from: Date(timeIntervalSince1970: item.time)
+            )
+            return itemComponents.year == nowComponents.year
+                && itemComponents.month == nowComponents.month
+                && itemComponents.day == nowComponents.day
+                && itemComponents.hour == nowComponents.hour
+        }) {
+            return max(0, min(index, hourly.count - 1))
+        }
+
+        let targetTime = now.timeIntervalSince1970
         let index = hourly.firstIndex { item in
             item.time >= targetTime
         } ?? (hourly.count - 1)
         return max(0, min(index, hourly.count - 1))
+    }
+
+    private func scrollHourlyCollection(to index: Int, animated: Bool) {
+        let itemCount = self.hourlyCollectionView.numberOfItems(inSection: 0)
+        guard itemCount > 0 else {
+            return
+        }
+
+        let row = max(0, min(index, itemCount - 1))
+        let itemWidth = self.hourlyCollectionView.cellSize.width
+        let maxOffsetX = max(0.0, self.hourlyCollectionView.contentSize.width - self.hourlyCollectionView.bounds.width)
+        let leftOffsetX = min(maxOffsetX, max(0.0, CGFloat(row) * itemWidth))
+        let offsetX = self.hourlyCollectionView.isRtl ? maxOffsetX - leftOffsetX : leftOffsetX
+        self.hourlyCollectionView.setContentOffset(
+            CGPoint(x: offsetX, y: 0.0),
+            animated: animated
+        )
+    }
+
+    private func configureNotice(_ notice: HourlyWeatherNotice?) {
+        guard let notice = notice else {
+            self.noticeContainer.isHidden = true
+            self.noticeTitleLabel.text = nil
+            self.noticeSubtitleLabel.text = nil
+            self.updateNoticeSeparatorVisibility()
+            return
+        }
+
+        self.noticeTitleLabel.text = notice.title
+        self.noticeSubtitleLabel.text = notice.subtitle
+        self.noticeSubtitleLabel.isHidden = (notice.subtitle ?? "").isEmpty
+        self.noticeContainer.isHidden = false
+        self.updateNoticeSeparatorVisibility()
+    }
+
+    private func configureMinutely(_ weather: Weather?, location: Location) {
+        guard let weather = weather,
+              let minutely = weather.minutelyForecast,
+              minutely.isValid else {
+            self.minutelyTitleVibrancyContainer.isHidden = true
+            self.minutelyView.isHidden = true
+            self.updateNoticeSeparatorVisibility()
+            return
+        }
+
+        let color = UIColor(
+            ThemeManager.weatherThemeDelegate.getThemeColor(
+                weatherKind: weatherCodeToWeatherKind(code: weather.current.weatherCode),
+                daylight: location.isDaylight
+            )
+        )
+        self.minutelyView.polylineColor = { _ in color }
+        self.minutelyView.baselineColor = color
+        self.minutelyView.polylineTintColor = .systemBlue
+
+        let maxIntensity = minutely.precipitationIntensities.max { a, b in a < b } ?? precipitationIntensityHeavy
+        self.minutelyView.polylineValues = minutely.precipitationIntensities.map { intensity in
+            min(1.0, intensity / maxIntensity)
+        }
+        self.minutelyView.polylineDescriptionMapper = { value in
+            let unit = SettingsManager.shared.precipitationIntensityUnit
+            return unit.formatValueWithUnit(
+                value * maxIntensity,
+                unit: getLocalizedText(unit.key)
+            )
+        }
+        self.minutelyView.beginTime = formateTime(
+            timeIntervalSine1970: minutely.beginTime,
+            twelveHour: isTwelveHour()
+        )
+        self.minutelyView.centerTime = formateTime(
+            timeIntervalSine1970: (minutely.beginTime + minutely.endTime) / 2.0,
+            twelveHour: isTwelveHour()
+        )
+        self.minutelyView.endTime = formateTime(
+            timeIntervalSine1970: minutely.endTime,
+            twelveHour: isTwelveHour()
+        )
+
+        self.minutelyTitleVibrancyContainer.isHidden = false
+        self.minutelyView.isHidden = false
+        self.updateNoticeSeparatorVisibility()
+    }
+
+    private func updateNoticeSeparatorVisibility() {
+        self.noticeSeparator.isHidden = self.noticeContainer.isHidden
+            && self.minutelyTitleVibrancyContainer.isHidden
+            && self.minutelyView.isHidden
+    }
+
+    private func logHourlyAlignmentDebugIfNeeded(
+        location: Location,
+        hourly: [Hourly],
+        index: Int
+    ) {
+        #if DEBUG
+        guard !self.hasLoggedHourlyAlignmentDebug else {
+            return
+        }
+        self.hasLoggedHourlyAlignmentDebug = true
+        let selected = hourly.get(index)
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm zzz"
+        formatter.timeZone = .current
+        printLog(
+            keyword: "hourlyAlignment",
+            content: [
+                "Hourly alignment debug:",
+                "device timezone = \(TimeZone.current.identifier)",
+                "location timezone = \(location.timezone.identifier)",
+                "first hourly date = \(hourly.first.map { formatter.string(from: Date(timeIntervalSince1970: $0.time)) } ?? "nil")",
+                "now = \(formatter.string(from: Date()))",
+                "selected index = \(index)",
+                "selected hour label = \(selected.map { formatter.string(from: Date(timeIntervalSince1970: $0.time)) } ?? "nil")"
+            ].joined(separator: " ")
+        )
+        #endif
     }
 
     private func dayOfYear(for time: TimeInterval, timezone: TimeZone) -> Int? {

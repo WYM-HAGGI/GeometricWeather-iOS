@@ -106,6 +106,8 @@
 "weather_dust" = "Dust";
 "weather_sand" = "Sand";
 "weather_wind" = "Wind";
+"weather_thunder" = "Thunder";
+"weather_thunderstorm" = "Thunderstorm";
 
 "wind_0" = "Calm";
 "wind_1" = "Light air";
@@ -168,6 +170,16 @@
 "hourly_overview" = "Hourly forecast";
 "minutely_overview" = "Minutely forecast";
 "precipitation_overview" = "Precipitation forecast";
+"hourly_notice_precipitation_title" = "Rain expected soon";
+"hourly_notice_thunderstorm_title" = "Thunderstorm";
+"hourly_notice_wind_title" = "Wind alert";
+"hourly_notice_weather_alert_title" = "Weather alert";
+"hourly_notice_severe_weather_title" = "Severe weather";
+"hourly_notice_precipitation_subtitle" = "Precipitation may occur in the next 60 minutes.";
+"hourly_notice_thunderstorm_subtitle" = "Thunderstorms may occur soon. Stay safe.";
+"hourly_notice_wind_subtitle" = "Strong winds are possible soon.";
+"hourly_notice_weather_alert_subtitle" = "Active weather alerts are in effect.";
+"hourly_notice_severe_weather_subtitle" = "Severe weather may occur soon.";
 "air_quality" = "Air quality";
 "allergen" = "Allergen";
 "life_details" = "Details";

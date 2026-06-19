@@ -92,7 +92,7 @@ private func updateLiveActivity(for location: Location) async throws {
                     isCurrentPosition: location.currentPosition,
                     timestamp: base.timeStamp,
                     timezone: location.timezone,
-                    weatherText: current.weatherText,
+                    weatherText: getDisplayWeatherText(current.weatherText),
                     weatherCode: current.weatherCode,
                     temperature: current.temperature.temperature,
                     daytimeTemperature: today.day.temperature.temperature,

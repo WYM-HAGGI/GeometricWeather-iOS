@@ -68,6 +68,7 @@ class MainHourlyCardCell: MainTableViewCell,
     private var lastBoundLocationId: String?
     private var hasUserScrolledHourlyCollectionView = false
     private var hasLoggedHourlyAlignmentDebug = false
+    private var fallbackAlertTask: Task<Void, Never>?
 
     // MARK: - life cycle.
 
@@ -227,6 +228,7 @@ class MainHourlyCardCell: MainTableViewCell,
 
     override func bindData(location: Location, timeBar: MainTimeBarView?) {
         super.bindData(location: location, timeBar: timeBar)
+        self.fallbackAlertTask?.cancel()
         self.isSyncScrollingEnabled = SettingsManager.shared.trendSyncEnabled
         let locationChanged = self.lastBoundLocationId != location.formattedId
         if locationChanged {
@@ -244,7 +246,14 @@ class MainHourlyCardCell: MainTableViewCell,
 
         self.summaryLabel.text = weather.current.hourlyForecast
         self.summaryLabel.isHidden = (weather.current.hourlyForecast ?? "").isEmpty
-        self.configureNotice(HourlyWeatherNoticeBuilder.build(for: location, weather: weather))
+        self.configureNotice(
+            HourlyWeatherNoticeBuilder.build(
+                for: location,
+                weather: weather,
+                fallbackAlerts: WeatherAlertProviderBridge.cachedFallbackAlerts(for: location)
+            )
+        )
+        self.fetchFallbackAlertNoticeIfNeeded(location: location, weather: weather)
         self.configureMinutely(weather, location: location)
 
         let generators = self.ensureTrendGenerators(for: location)
@@ -255,6 +264,10 @@ class MainHourlyCardCell: MainTableViewCell,
 
         self.hourlyCollectionView.reloadData()
         self.alignHourlyCollectionIfNeeded(location: location)
+    }
+
+    deinit {
+        self.fallbackAlertTask?.cancel()
     }
 
     override func traitCollectionDidChange(
@@ -663,6 +676,35 @@ class MainHourlyCardCell: MainTableViewCell,
         self.noticeSubtitleLabel.isHidden = (notice.subtitle ?? "").isEmpty
         self.noticeContainer.isHidden = false
         self.updateNoticeSeparatorVisibility()
+    }
+
+    private func fetchFallbackAlertNoticeIfNeeded(location: Location, weather: Weather) {
+        self.fallbackAlertTask = Task { [weak self] in
+            do {
+                let alerts = try await WeatherAlertProviderBridge.getFallbackAlerts(for: location)
+                guard !Task.isCancelled else {
+                    return
+                }
+                await MainActor.run { [weak self] in
+                    guard let self = self,
+                          self.location?.formattedId == location.formattedId else {
+                        return
+                    }
+                    self.configureNotice(
+                        HourlyWeatherNoticeBuilder.build(
+                            for: location,
+                            weather: weather,
+                            fallbackAlerts: alerts
+                        )
+                    )
+                }
+            } catch {
+                printLog(
+                    keyword: "weatherAlert",
+                    content: "Fallback alert notice fetch failed: \(error.localizedDescription)"
+                )
+            }
+        }
     }
 
     private func configureMinutely(_ weather: Weather?, location: Location) {

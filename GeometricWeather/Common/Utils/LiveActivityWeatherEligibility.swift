@@ -77,7 +77,7 @@ struct LiveActivityWeatherEligibility {
 
     private static func hasValidAlert(_ alerts: [WeatherAlert]) -> Bool {
         return alerts.contains { alert in
-            WeatherAlertValidation.isLiveActivityEligible(alert)
+            alert.shouldTriggerLiveActivity
         }
     }
 

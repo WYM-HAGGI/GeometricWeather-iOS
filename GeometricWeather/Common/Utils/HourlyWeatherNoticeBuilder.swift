@@ -27,17 +27,20 @@ struct HourlyWeatherNotice {
 
 struct HourlyWeatherNoticeBuilder {
 
-    static func build(for location: Location, weather: Weather?) -> HourlyWeatherNotice? {
+    static func build(
+        for location: Location,
+        weather: Weather?,
+        fallbackAlerts: [WeatherAlert] = []
+    ) -> HourlyWeatherNotice? {
         guard let weather = weather else {
             return nil
         }
 
-        if weather.alerts.contains(where: { WeatherAlertValidation.isLiveActivityEligible($0) }) {
-            return notice(
-                titleKey: "hourly_notice_weather_alert_title",
-                subtitleKey: "hourly_notice_weather_alert_subtitle",
-                reason: .alert
-            )
+        if let alert = (weather.alerts + fallbackAlerts)
+            .filter({ $0.shouldShowHomeNotice })
+            .sorted(by: sortAlert)
+            .first {
+            return alertNotice(alert)
         }
         if isSevere(weather.current.weatherCode)
             || upcomingHourlies(weather.hourlyForecasts).contains(where: { isSevere($0.weatherCode) }) {
@@ -92,6 +95,40 @@ struct HourlyWeatherNoticeBuilder {
             startDate: nil,
             endDate: nil
         )
+    }
+
+    private static func alertNotice(_ alert: WeatherAlert) -> HourlyWeatherNotice {
+        return HourlyWeatherNotice(
+            title: alert.noticeTitle,
+            subtitle: alert.noticeSubtitle,
+            reason: .alert,
+            startDate: Date(timeIntervalSince1970: alert.time),
+            endDate: nil
+        )
+    }
+
+    private static func sortAlert(_ lhs: WeatherAlert, _ rhs: WeatherAlert) -> Bool {
+        let lhsSeverity = severityRank(lhs.normalizedSeverity)
+        let rhsSeverity = severityRank(rhs.normalizedSeverity)
+        if lhsSeverity != rhsSeverity {
+            return lhsSeverity > rhsSeverity
+        }
+        return lhs.time > rhs.time
+    }
+
+    private static func severityRank(_ severity: WeatherAlertSeverity) -> Int {
+        switch severity {
+        case .extreme:
+            return 4
+        case .severe:
+            return 3
+        case .moderate:
+            return 2
+        case .minor:
+            return 1
+        case .unknown:
+            return 0
+        }
     }
 
     private static func hasCurrentPrecipitation(_ current: Current) -> Bool {

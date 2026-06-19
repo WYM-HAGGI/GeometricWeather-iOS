@@ -192,6 +192,7 @@
 "weather_alert_type_heavy_snow" = "Snowstorm alert";
 "weather_alert_type_typhoon" = "Typhoon alert";
 "weather_alert_type_sandstorm" = "Sandstorm alert";
+"weather_alert_title_format" = "%2$@ %1$@";
 "weather_alert_severity_blue" = "Blue";
 "weather_alert_severity_yellow" = "Yellow";
 "weather_alert_severity_orange" = "Orange";

@@ -81,7 +81,7 @@ extension WeatherAlert {
         if severityText.isEmpty {
             return typeText
         }
-        return severityText + " " + typeText
+        return WeatherAlertValidation.localizedTitle(typeText: typeText, severityText: severityText)
     }
 
     var noticeSubtitle: String {
@@ -237,6 +237,14 @@ struct WeatherAlertValidation {
         }
     }
 
+    static func localizedTitle(typeText: String, severityText: String) -> String {
+        let format = getLocalizedText("weather_alert_title_format")
+        if format == "weather_alert_title_format" || format.isEmpty {
+            return severityText + " " + typeText
+        }
+        return String(format: format, typeText, severityText)
+    }
+
     private static func containsAny(_ text: String, _ keywords: [String]) -> Bool {
         let lowercased = text.lowercased()
         return keywords.contains { lowercased.contains($0.lowercased()) }
@@ -245,8 +253,11 @@ struct WeatherAlertValidation {
 
 final class DefaultWeatherAlertFallbackProvider: WeatherAlertProvider {
 
-    let providerName = "Default weather alert fallback"
+    let providerName = "WMO SWIC"
     private let cacheLifetime: TimeInterval = 10 * 60
+    private let remoteProviders: [WeatherAlertProvider] = [
+        WmoSevereWeatherAlertProvider()
+    ]
     private let lock = NSLock()
     private var cache = [String: (date: Date, alerts: [WeatherAlert])]()
 
@@ -306,11 +317,19 @@ final class DefaultWeatherAlertFallbackProvider: WeatherAlertProvider {
     }
 
     private func fetchRemoteAlerts(for location: Location) async throws -> [WeatherAlert] {
-        // Research result for 3A:
-        // AMap Web weather only documents live/forecast weather, not public alerts.
-        // 12379 / China Weather alert feeds are authoritative but do not expose a stable,
-        // officially documented low-risk public API in this app yet. Keep this as the
-        // replaceable networking seam for a future reliable alert source.
+        for provider in remoteProviders {
+            do {
+                let alerts = try await provider.fetchAlerts(for: location)
+                if !alerts.isEmpty {
+                    return alerts
+                }
+            } catch {
+                printLog(
+                    keyword: "weatherAlert",
+                    content: "\(provider.providerName) failed: \(error.localizedDescription)"
+                )
+            }
+        }
         return []
     }
 
@@ -381,6 +400,182 @@ final class DefaultWeatherAlertFallbackProvider: WeatherAlertProvider {
         )
     }
     #endif
+}
+
+/// Alert-only fallback based on Breezy Weather's WMO Severe Weather source.
+///
+/// Breezy Weather's China source also exposes alerts, but it lives in `src_nonfreenet`
+/// and uses Xiaomi Weather aggregation endpoints with bundled appKey/sign values. Do
+/// not copy those credentials into this iOS app. This provider uses WMO SWIC instead
+/// because it is public and keyless, while keeping the same alert-only role split that
+/// Breezy uses through `SourceFeature.ALERT`.
+final class WmoSevereWeatherAlertProvider: WeatherAlertProvider {
+
+    let providerName = "WMO Severe Weather Information Centre"
+
+    private enum Constant {
+        static let baseURL = "https://severeweather.wmo.int/f/wfs"
+        static let timeout: TimeInterval = 8
+    }
+
+    func fetchAlerts(for location: Location) async throws -> [WeatherAlert] {
+        let coordinateOrders = [
+            (location.longitude, location.latitude),
+            // Breezy currently uses this order in its WMO source. Try it as a fallback
+            // so we do not silently miss alerts if SWIC geometry expects that variant.
+            (location.latitude, location.longitude)
+        ]
+
+        for coordinateOrder in coordinateOrders {
+            let alerts = try await requestAlerts(
+                firstCoordinate: coordinateOrder.0,
+                secondCoordinate: coordinateOrder.1
+            )
+            if !alerts.isEmpty {
+                return alerts
+            }
+        }
+        return []
+    }
+
+    private func requestAlerts(firstCoordinate: Double, secondCoordinate: Double) async throws -> [WeatherAlert] {
+        var components = URLComponents(string: Constant.baseURL)
+        let cqlFilter = "INTERSECTS(wkb_geometry, POINT (\(firstCoordinate) \(secondCoordinate))) AND row_type NEQ 'BOUNDARY'"
+        components?.queryItems = [
+            URLQueryItem(name: "request", value: "GetFeature"),
+            URLQueryItem(name: "version", value: "1.1.0"),
+            URLQueryItem(name: "typeName", value: "local_postgis:postgis_geojsons"),
+            URLQueryItem(name: "cql_filter", value: cqlFilter),
+            URLQueryItem(name: "outputFormat", value: "json")
+        ]
+
+        guard let url = components?.url else {
+            throw WeatherAlertProviderError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.timeoutInterval = Constant.timeout
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200..<300).contains(httpResponse.statusCode) else {
+            throw WeatherAlertProviderError.invalidResponse
+        }
+
+        let result = try JSONDecoder().decode(WmoSevereWeatherAlertResponse.self, from: data)
+        return (result.features ?? [])
+            .compactMap { convert(feature: $0) }
+            .filter { $0.shouldShowHomeNotice }
+    }
+
+    private func convert(feature: WmoSevereWeatherAlertFeature) -> WeatherAlert? {
+        guard let properties = feature.properties else {
+            return nil
+        }
+        let expires = WeatherAlertDateParser.date(from: properties.expires)
+        if let expires = expires, expires <= Date() {
+            return nil
+        }
+
+        let event = properties.event?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let description = properties.description?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let startDate = WeatherAlertDateParser.date(from: properties.onset)
+            ?? WeatherAlertDateParser.date(from: properties.effective)
+            ?? WeatherAlertDateParser.date(from: properties.sent)
+            ?? Date()
+
+        let title = event?.isEmpty == false ? event! : getLocalizedText("weather_alert")
+        let content = description?.isEmpty == false ? description! : getLocalizedText("hourly_notice_weather_alert_subtitle")
+        let priority = max(0, min(properties.s ?? 0, 4))
+        let idSeed = [
+            feature.id,
+            properties.identifier,
+            properties.capurl,
+            properties.url,
+            title,
+            String(Int(startDate.timeIntervalSince1970))
+        ]
+            .compactMap { $0?.isEmpty == false ? $0 : nil }
+            .joined(separator: "|")
+
+        return WeatherAlert(
+            alertId: WeatherAlertStableID.make(from: idSeed),
+            time: startDate.timeIntervalSince1970,
+            description: title,
+            content: content,
+            type: title,
+            priority: priority,
+            color: priority
+        )
+    }
+}
+
+private enum WeatherAlertProviderError: Error {
+    case invalidURL
+    case invalidResponse
+}
+
+private struct WmoSevereWeatherAlertResponse: Decodable {
+    let features: [WmoSevereWeatherAlertFeature]?
+}
+
+private struct WmoSevereWeatherAlertFeature: Decodable {
+    let id: String?
+    let properties: WmoSevereWeatherAlertProperties?
+}
+
+private struct WmoSevereWeatherAlertProperties: Decodable {
+    let capurl: String?
+    let identifier: String?
+    let sent: String?
+    let description: String?
+    let event: String?
+    let s: Int?
+    let effective: String?
+    let onset: String?
+    let url: String?
+    let expires: String?
+}
+
+private enum WeatherAlertDateParser {
+
+    private static let isoFormatter = ISO8601DateFormatter()
+
+    static func date(from value: String?) -> Date? {
+        guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !value.isEmpty else {
+            return nil
+        }
+        if let date = isoFormatter.date(from: value) {
+            return date
+        }
+
+        let fallback = DateFormatter()
+        fallback.locale = Locale(identifier: "en_US_POSIX")
+        fallback.timeZone = TimeZone(secondsFromGMT: 0)
+        for format in [
+            "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX",
+            "yyyy-MM-dd'T'HH:mm:ssXXXXX",
+            "yyyy-MM-dd HH:mm:ss"
+        ] {
+            fallback.dateFormat = format
+            if let date = fallback.date(from: value) {
+                return date
+            }
+        }
+        return nil
+    }
+}
+
+private enum WeatherAlertStableID {
+
+    static func make(from text: String) -> Int64 {
+        var hash: UInt64 = 1469598103934665603
+        for byte in text.utf8 {
+            hash ^= UInt64(byte)
+            hash &*= 1099511628211
+        }
+        return Int64(bitPattern: hash)
+    }
 }
 
 enum WeatherAlertProviderBridge {

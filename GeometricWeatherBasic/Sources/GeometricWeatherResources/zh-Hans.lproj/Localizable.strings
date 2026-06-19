@@ -189,6 +189,7 @@
 "weather_alert_type_heavy_snow" = "暴雪预警";
 "weather_alert_type_typhoon" = "台风预警";
 "weather_alert_type_sandstorm" = "沙尘暴预警";
+"weather_alert_title_format" = "%2$@%1$@";
 "weather_alert_severity_blue" = "蓝色";
 "weather_alert_severity_yellow" = "黄色";
 "weather_alert_severity_orange" = "橙色";

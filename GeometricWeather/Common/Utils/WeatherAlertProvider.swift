@@ -46,7 +46,7 @@ enum WeatherAlertType {
     case unknown
 }
 
-enum DebugWeatherAlertScenario {
+enum DebugWeatherAlertScenario: String {
     case rainstormYellow
     case thunderstormOrange
     case windBlue
@@ -264,14 +264,22 @@ final class DefaultWeatherAlertFallbackProvider: WeatherAlertProvider {
     #if DEBUG
     static var debugMockAlertsEnabled = false
     static var debugMockScenario: DebugWeatherAlertScenario = .rainstormYellow
+
+    private enum DebugKey {
+        static let mockScenario = "GEOWEATHER_DEBUG_ALERT_SCENARIO"
+    }
     #endif
 
     func fetchAlerts(for location: Location) async throws -> [WeatherAlert] {
         // This provider is intentionally alert-only. It must never overwrite current,
         // hourly, daily, or minutely weather from the selected forecast provider.
         #if DEBUG
-        if Self.debugMockAlertsEnabled {
-            let alerts = Self.mockAlerts(scenario: Self.debugMockScenario)
+        if let scenario = Self.runtimeMockScenario() {
+            let alerts = Self.mockAlerts(scenario: scenario)
+            printLog(
+                keyword: "weatherAlert",
+                content: "Using DEBUG mock alert scenario: \(scenario.rawValue)"
+            )
             cacheAlerts(alerts, for: location)
             return alerts
         }
@@ -334,6 +342,18 @@ final class DefaultWeatherAlertFallbackProvider: WeatherAlertProvider {
     }
 
     #if DEBUG
+    private static func runtimeMockScenario() -> DebugWeatherAlertScenario? {
+        if let value = ProcessInfo.processInfo.environment[DebugKey.mockScenario],
+           let scenario = DebugWeatherAlertScenario(rawValue: value) {
+            return scenario
+        }
+        if let value = UserDefaults.standard.string(forKey: DebugKey.mockScenario),
+           let scenario = DebugWeatherAlertScenario(rawValue: value) {
+            return scenario
+        }
+        return debugMockAlertsEnabled ? debugMockScenario : nil
+    }
+
     private static func mockAlerts(scenario: DebugWeatherAlertScenario) -> [WeatherAlert] {
         let now = Date().timeIntervalSince1970
         switch scenario {
@@ -418,7 +438,20 @@ final class WmoSevereWeatherAlertProvider: WeatherAlertProvider {
         static let timeout: TimeInterval = 8
     }
 
+    #if DEBUG
+    private enum DebugKey {
+        static let forceFailure = "GEOWEATHER_DEBUG_ALERT_FORCE_NETWORK_FAILURE"
+    }
+    #endif
+
     func fetchAlerts(for location: Location) async throws -> [WeatherAlert] {
+        #if DEBUG
+        if ProcessInfo.processInfo.environment[DebugKey.forceFailure] == "1"
+            || UserDefaults.standard.bool(forKey: DebugKey.forceFailure) {
+            throw WeatherAlertProviderError.debugForcedFailure
+        }
+        #endif
+
         let coordinateOrders = [
             (location.longitude, location.latitude),
             // Breezy currently uses this order in its WMO source. Try it as a fallback
@@ -512,6 +545,9 @@ final class WmoSevereWeatherAlertProvider: WeatherAlertProvider {
 private enum WeatherAlertProviderError: Error {
     case invalidURL
     case invalidResponse
+    #if DEBUG
+    case debugForcedFailure
+    #endif
 }
 
 private struct WmoSevereWeatherAlertResponse: Decodable {

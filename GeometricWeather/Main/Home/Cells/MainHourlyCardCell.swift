@@ -108,6 +108,7 @@ class MainHourlyCardCell: MainTableViewCell,
 
         self.minutelyTitle.text = getLocalizedText("precipitation_overview")
         self.minutelyTitle.font = titleFont
+        self.minutelyTitleVibrancyContainer.effect = nil
         self.minutelyTitleVibrancyContainer.contentView.addSubview(self.minutelyTitle)
         self.minutelyTitleVibrancyContainer.isHidden = true
         self.vstack.addArrangedSubview(self.minutelyTitleVibrancyContainer)
@@ -222,6 +223,7 @@ class MainHourlyCardCell: MainTableViewCell,
 
     override func bindData(location: Location, timeBar: MainTimeBarView?) {
         super.bindData(location: location, timeBar: timeBar)
+        self.applyReadableHourlyColors(location: location)
         self.fallbackAlertTask?.cancel()
         let locationChanged = self.lastBoundLocationId != location.formattedId
         if locationChanged {
@@ -276,6 +278,7 @@ class MainHourlyCardCell: MainTableViewCell,
         _ previousTraitCollection: UITraitCollection?
     ) {
         super.traitCollectionDidChange(previousTraitCollection)
+        self.applyReadableHourlyColors(location: self.location)
         DispatchQueue.main.async {
             self.hourlyCollectionView.reloadData()
         }
@@ -693,6 +696,11 @@ class MainHourlyCardCell: MainTableViewCell,
         self.noticeSeparator.isHidden = self.noticeContainer.isHidden
             && self.minutelyTitleVibrancyContainer.isHidden
             && self.minutelyView.isHidden
+    }
+
+    private func applyReadableHourlyColors(location: Location?) {
+        self.minutelyTitle.textColor = self.readableCardTitleColor(location: location)
+        self.summaryLabel.textColor = self.readableCardSecondaryTextColor()
     }
 
     private func logHourlyAlignmentDebugIfNeeded(

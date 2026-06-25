@@ -28,7 +28,7 @@ class MainFooterCell: UITableViewCell, AbstractMainItem {
             ofSize: miniCaptionFont.pointSize,
             weight: .medium
         )
-        self.addressLabel.textColor = .white.withAlphaComponent(0.72)
+        self.addressLabel.textColor = MainHomeReadableColors.footerSecondaryTextColor
         self.addressLabel.textAlignment = .center
         self.addressLabel.numberOfLines = 2
         self.addressLabel.lineBreakMode = .byTruncatingTail
@@ -38,7 +38,7 @@ class MainFooterCell: UITableViewCell, AbstractMainItem {
             ofSize: captionFont.pointSize,
             weight: .bold
         )
-        self.titleLabel.textColor = .white
+        self.titleLabel.textColor = MainHomeReadableColors.footerPrimaryTextColor
         self.titleLabel.textAlignment = .center
         self.contentView.addSubview(self.titleLabel)
         
@@ -77,6 +77,7 @@ class MainFooterCell: UITableViewCell, AbstractMainItem {
     }
     
     func bindData(location: Location, timeBar: MainTimeBarView?) {
+        self.applyReadableFooterColors()
         if let detail = getLocationDetailText(location: location), !detail.isEmpty {
             self.addressLabel.isHidden = false
             self.addressLabel.text = (
@@ -99,5 +100,15 @@ class MainFooterCell: UITableViewCell, AbstractMainItem {
         self.window?.windowScene?.eventBus.post(
             MainFooterEditButtonTapAction()
         )
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        self.applyReadableFooterColors()
+    }
+
+    private func applyReadableFooterColors() {
+        self.addressLabel.textColor = MainHomeReadableColors.footerSecondaryTextColor
+        self.titleLabel.textColor = MainHomeReadableColors.footerPrimaryTextColor
     }
 }

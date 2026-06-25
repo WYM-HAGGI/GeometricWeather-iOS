@@ -60,6 +60,7 @@ class MainTableViewCell: UITableViewCell, AbstractMainItem {
         self.cardContainer.layer.masksToBounds = true
         self.contentView.addSubview(self.cardContainer)
         
+        self.titleVibrancyContainer.effect = nil
         self.cardTitle.font = titleFont
         self.titleVibrancyContainer.contentView.addSubview(self.cardTitle)
         self.cardContainer.contentView.addSubview(self.titleVibrancyContainer)
@@ -100,6 +101,7 @@ class MainTableViewCell: UITableViewCell, AbstractMainItem {
                 daylight: location.isDaylight
             )
         )
+        self.applyReadableCardColors(location: location)
         
         if let timeBar = timeBar {
             timeBar.removeFromSuperview()
@@ -128,6 +130,78 @@ class MainTableViewCell: UITableViewCell, AbstractMainItem {
                 make.leading.equalToSuperview().offset(normalMargin)
                 make.trailing.equalToSuperview().offset(-normalMargin)
             }
+        }
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        self.applyReadableCardColors(location: self.location)
+    }
+
+    func readableCardTitleColor(location: Location?) -> UIColor {
+        return MainHomeReadableColors.cardTitleColor(
+            themeColor: self.themeAccentColor(location: location),
+            isDaylight: location?.isDaylight ?? true
+        )
+    }
+
+    func readableCardSecondaryTextColor() -> UIColor {
+        return MainHomeReadableColors.secondaryTextColor
+    }
+
+    private func applyReadableCardColors(location: Location?) {
+        self.cardTitle.textColor = self.readableCardTitleColor(location: location)
+    }
+
+    private func themeAccentColor(location: Location?) -> UIColor {
+        let color = ThemeManager.weatherThemeDelegate.getThemeColor(
+            weatherKind: weatherCodeToWeatherKind(
+                code: location?.weather?.current.weatherCode ?? .clear
+            ),
+            daylight: location?.isDaylight ?? true
+        )
+        return UIColor(color)
+    }
+}
+
+enum MainHomeReadableColors {
+
+    static func cardTitleColor(
+        themeColor: UIColor,
+        isDaylight: Bool
+    ) -> UIColor {
+        return UIColor { trait in
+            if trait.userInterfaceStyle == .dark || !isDaylight {
+                return UIColor.white.withAlphaComponent(0.94)
+            }
+            return themeColor
+        }
+    }
+
+    static var secondaryTextColor: UIColor {
+        return UIColor { trait in
+            if trait.userInterfaceStyle == .dark {
+                return UIColor.white.withAlphaComponent(0.78)
+            }
+            return UIColor.secondaryLabel
+        }
+    }
+
+    static var footerPrimaryTextColor: UIColor {
+        return UIColor { trait in
+            if trait.userInterfaceStyle == .dark {
+                return UIColor.white.withAlphaComponent(0.96)
+            }
+            return UIColor.white.withAlphaComponent(0.92)
+        }
+    }
+
+    static var footerSecondaryTextColor: UIColor {
+        return UIColor { trait in
+            if trait.userInterfaceStyle == .dark {
+                return UIColor.white.withAlphaComponent(0.84)
+            }
+            return UIColor.white.withAlphaComponent(0.78)
         }
     }
 }

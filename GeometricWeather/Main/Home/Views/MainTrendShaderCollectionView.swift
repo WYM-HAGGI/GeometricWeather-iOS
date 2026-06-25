@@ -153,6 +153,7 @@ fileprivate class MainTrendScrollBarView: UICollectionReusableView {
         self.foregroundLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
         self.foregroundLayer.endPoint = CGPoint(x: 0.5, y: 1.0)
         self.layer.addSublayer(self.foregroundLayer)
+        self.setScrollBarColors()
     }
     
     required init?(coder: NSCoder) {
@@ -160,6 +161,8 @@ fileprivate class MainTrendScrollBarView: UICollectionReusableView {
     }
     
     override func layoutSubviews() {
+        super.layoutSubviews()
+        self.setScrollBarColors()
         self.foregroundLayer.frame = CGRect(
             x: 0.0,
             y: 0.0,
@@ -177,11 +180,12 @@ fileprivate class MainTrendScrollBarView: UICollectionReusableView {
     }
     
     private func setScrollBarColors() {
+        let foregroundColor = self.traitCollection.userInterfaceStyle == .light
+            ? UIColor.black.withAlphaComponent(0.07)
+            : UIColor.white.withAlphaComponent(0.18)
         self.foregroundLayer.colors = [
             UIColor.clear.cgColor,
-            self.traitCollection.userInterfaceStyle == .light
-            ? UIColor.black.withAlphaComponent(0.04).cgColor
-            : UIColor.white.withAlphaComponent(0.04).cgColor,
+            foregroundColor.cgColor,
             UIColor.clear.cgColor,
         ]
     }

@@ -106,6 +106,7 @@ class MainDailyCardCell: MainTableViewCell,
     
     override func bindData(location: Location, timeBar: MainTimeBarView?) {
         super.bindData(location: location, timeBar: timeBar)
+        self.summaryLabel.textColor = self.readableCardSecondaryTextColor()
         
         guard let weather = location.weather else {
             return
@@ -133,6 +134,7 @@ class MainDailyCardCell: MainTableViewCell,
         _ previousTraitCollection: UITraitCollection?
     ) {
         super.traitCollectionDidChange(previousTraitCollection)
+        self.summaryLabel.textColor = self.readableCardSecondaryTextColor()
         DispatchQueue.main.async {
             self.dailyCollectionView.reloadData()
         }

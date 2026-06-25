@@ -20,10 +20,6 @@ struct HourlyTrendCellTapAction {
     let index: Int
 }
 
-struct HourlyTrendManuallyScrollEvent {
-    let targetDayOfYear: Int
-}
-
 class MainHourlyCardCell: MainTableViewCell,
                             UICollectionViewDataSource,
                             UICollectionViewDelegateFlowLayout,
@@ -59,14 +55,11 @@ class MainHourlyCardCell: MainTableViewCell,
     // MARK: - data.
 
     private var validTrendGenerators = [MainTrendGeneratorProtocol]()
+    private var displayLocation: Location?
+    private var displayHourlySourceStartIndex = 0
 
-    private let selectionReactor = UISelectionFeedbackGenerator()
-    private var isChangingHourlyCollectionViewScrollOffsetManually = false
-    private var isDraggingHourlyCollectionView = false
-    private var currentScrollDayOfYear = -1
-    private var isSyncScrollingEnabled = false
     private var lastBoundLocationId: String?
-    private var hasUserScrolledHourlyCollectionView = false
+    private var lastHourlyDisplaySignature: String?
     private var hasLoggedHourlyAlignmentDebug = false
     private var fallbackAlertTask: Task<Void, Never>?
 
@@ -130,6 +123,7 @@ class MainHourlyCardCell: MainTableViewCell,
 
         self.hourlyCollectionView.delegate = self
         self.hourlyCollectionView.dataSource = self
+        self.hourlyCollectionView.highlightsLeadingVisibleItem = true
         self.getAllTrendGeneratorTypes().forEach { item in
             item.registerCellClass(to: self.hourlyCollectionView)
         }
@@ -229,16 +223,17 @@ class MainHourlyCardCell: MainTableViewCell,
     override func bindData(location: Location, timeBar: MainTimeBarView?) {
         super.bindData(location: location, timeBar: timeBar)
         self.fallbackAlertTask?.cancel()
-        self.isSyncScrollingEnabled = SettingsManager.shared.trendSyncEnabled
         let locationChanged = self.lastBoundLocationId != location.formattedId
         if locationChanged {
             self.lastBoundLocationId = location.formattedId
-            self.hasUserScrolledHourlyCollectionView = false
-            self.currentScrollDayOfYear = -1
             self.hasLoggedHourlyAlignmentDebug = false
+            self.lastHourlyDisplaySignature = nil
         }
 
         guard let weather = location.weather else {
+            self.displayLocation = nil
+            self.displayHourlySourceStartIndex = 0
+            self.lastHourlyDisplaySignature = nil
             self.configureNotice(nil)
             self.configureMinutely(nil, location: location)
             return
@@ -256,14 +251,21 @@ class MainHourlyCardCell: MainTableViewCell,
         self.fetchFallbackAlertNoticeIfNeeded(location: location, weather: weather)
         self.configureMinutely(weather, location: location)
 
-        let generators = self.ensureTrendGenerators(for: location)
+        let display = Self.makeDisplayLocation(from: location, weather: weather)
+        self.displayLocation = display.location
+        self.displayHourlySourceStartIndex = display.sourceStartIndex
+
+        let generators = self.ensureTrendGenerators(for: display.location)
         self.validTrendGenerators = generators.valid
         self.hourlyTagView.tagList = generators.valid.map { item in
             item.dispayName
         }
 
         self.hourlyCollectionView.reloadData()
-        self.alignHourlyCollectionIfNeeded(location: location)
+        self.resetHourlyCollectionIfNeeded(
+            signature: display.signature,
+            location: display.location
+        )
     }
 
     deinit {
@@ -282,22 +284,6 @@ class MainHourlyCardCell: MainTableViewCell,
     @objc private func onDeviceOrientationChanged() {
         if !self.hourlyCollectionView.indexPathsForVisibleItems.isEmpty {
             self.hourlyCollectionView.reloadData()
-        }
-    }
-
-    override func willMove(toWindow newWindow: UIWindow?) {
-        self.window?
-            .windowScene?
-            .eventBus
-            .unregister(self, for: DailyTrendManuallyScrollEvent.self)
-    }
-
-    override func didMoveToWindow() {
-        self.window?.windowScene?.eventBus.register(
-            self,
-            for: DailyTrendManuallyScrollEvent.self
-        ) { [weak self] event in
-            self?.respondSynchronizeScrolling(for: event)
         }
     }
 
@@ -331,92 +317,8 @@ class MainHourlyCardCell: MainTableViewCell,
 
     // MARK: - scroll view delegate.
 
-    private func respondSynchronizeScrolling(
-        for event: DailyTrendManuallyScrollEvent
-    ) {
-        if self.isDraggingHourlyCollectionView {
-            return
-        }
-        guard let index = self.location?.weather?.hourlyForecasts.firstIndex(where: { item in
-            self.dayOfYear(
-                for: item.time,
-                timezone: self.location?.timezone ?? .current
-            ) == event.targetDayOfYear
-        }) else {
-            return
-        }
-
-        self.hourlyCollectionView.scrollAligmentlyToScrollBar(
-            at: IndexPath(row: index, section: 0),
-            animated: true
-        )
-        self.currentScrollDayOfYear = event.targetDayOfYear
-        self.selectionReactor.selectionChanged()
-    }
-
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if !self.isSyncScrollingEnabled {
-            return
-        }
-        if !self.isChangingHourlyCollectionViewScrollOffsetManually {
-            return
-        }
-        guard let scrollView = scrollView as? MainTrendShaderCollectionView else {
-            return
-        }
-        guard let hourly = self.location?.weather?.hourlyForecasts.get(
-            scrollView.highlightIndex
-        ) else {
-            return
-        }
-        guard let dayOfYear = self.dayOfYear(
-            for: hourly.time,
-            timezone: self.location?.timezone ?? .current
-        ) else {
-            return
-        }
-
-        if self.currentScrollDayOfYear != dayOfYear {
-            self.currentScrollDayOfYear = dayOfYear
-
-            self.window?.windowScene?.eventBus.post(
-                HourlyTrendManuallyScrollEvent(targetDayOfYear: dayOfYear)
-            )
-        }
-    }
-
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        self.isChangingHourlyCollectionViewScrollOffsetManually = true
-        self.isDraggingHourlyCollectionView = true
-        self.hasUserScrolledHourlyCollectionView = true
-    }
-
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if !decelerate {
-            self.isChangingHourlyCollectionViewScrollOffsetManually = false
-        }
-        self.isDraggingHourlyCollectionView = false
-
-        if !decelerate && self.isSyncScrollingEnabled {
-            self.hourlyCollectionView.scrollAligmentlyToScrollBar(
-                at: IndexPath(row: self.hourlyCollectionView.highlightIndex, section: 0),
-                animated: true
-            )
-        }
-    }
-
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        self.isChangingHourlyCollectionViewScrollOffsetManually = false
-
-        if !self.isSyncScrollingEnabled
-            || scrollView.contentOffset.x <= 0
-            || scrollView.contentOffset.x + scrollView.frame.width >= scrollView.contentSize.width {
-            return
-        }
-        self.hourlyCollectionView.scrollAligmentlyToScrollBar(
-            at: IndexPath(row: self.hourlyCollectionView.highlightIndex, section: 0),
-            animated: true
-        )
+        scrollView.setNeedsLayout()
     }
 
     // MARK: - collection view delegate.
@@ -436,7 +338,7 @@ class MainHourlyCardCell: MainTableViewCell,
         didSelectItemAt indexPath: IndexPath
     ) {
         self.window?.windowScene?.eventBus.post(
-            HourlyTrendCellTapAction(index: indexPath.row)
+            HourlyTrendCellTapAction(index: self.sourceHourlyIndex(forDisplayIndex: indexPath.row))
         )
     }
 
@@ -458,7 +360,7 @@ class MainHourlyCardCell: MainTableViewCell,
             return UIHostingController<HourlyView>(
                 rootView: HourlyView(
                     weather: weather,
-                    index: indexPath.row,
+                    index: self.sourceHourlyIndex(forDisplayIndex: indexPath.row),
                     timezone: timezone
                 )
             )
@@ -502,7 +404,7 @@ class MainHourlyCardCell: MainTableViewCell,
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        return self.location?.weather?.hourlyForecasts.count ?? 0
+        return self.displayLocation?.weather?.hourlyForecasts.count ?? 0
     }
 
     func collectionView(
@@ -547,70 +449,101 @@ class MainHourlyCardCell: MainTableViewCell,
 
     func onSelectedRepeatly(currentSelectedIndex: Int) {
         if self.hourlyCollectionView.indexPathsForVisibleItems.first != nil {
-            self.scrollHourlyCollection(
-                to: Self.currentHourlyIndex(
-                    hourly: self.location?.weather?.hourlyForecasts ?? [],
-                    now: Date(),
-                    displayTimeZone: self.location?.timezone ?? .current
-                ),
-                animated: true
-            )
-        }
-
-        if !self.isSyncScrollingEnabled {
-            return
-        }
-        let currentIndex = Self.currentHourlyIndex(
-            hourly: self.location?.weather?.hourlyForecasts ?? [],
-            now: Date(),
-            displayTimeZone: self.location?.timezone ?? .current
-        )
-        if let hourly = self.location?.weather?.hourlyForecasts.get(currentIndex),
-           let dayOfYear = self.dayOfYear(
-            for: hourly.time,
-            timezone: self.location?.timezone ?? .current
-           ) {
-            self.currentScrollDayOfYear = dayOfYear
-            self.window?.windowScene?.eventBus.post(
-                HourlyTrendManuallyScrollEvent(targetDayOfYear: dayOfYear)
-            )
+            self.scrollHourlyCollection(to: 0, animated: true)
         }
     }
 
-    private func alignHourlyCollectionIfNeeded(location: Location) {
-        guard !self.hasUserScrolledHourlyCollectionView,
-              let hourly = location.weather?.hourlyForecasts,
-              !hourly.isEmpty else {
+    private func resetHourlyCollectionIfNeeded(
+        signature: String,
+        location: Location
+    ) {
+        guard self.lastHourlyDisplaySignature != signature else {
             return
         }
-
-        let index = Self.currentHourlyIndex(
-            hourly: hourly,
-            now: Date(),
-            displayTimeZone: location.timezone
-        )
-        self.logHourlyAlignmentDebugIfNeeded(
-            location: location,
-            hourly: hourly,
-            index: index
-        )
+        self.lastHourlyDisplaySignature = signature
+        let hourly = location.weather?.hourlyForecasts ?? []
+        self.logHourlyAlignmentDebugIfNeeded(location: location, hourly: hourly, index: 0)
         DispatchQueue.main.async { [weak self] in
             guard let self = self,
-                  !self.hasUserScrolledHourlyCollectionView,
-                  self.location?.formattedId == location.formattedId,
+                  self.displayLocation?.formattedId == location.formattedId,
                   self.hourlyCollectionView.numberOfSections > 0,
-                  self.hourlyCollectionView.numberOfItems(inSection: 0) > index else {
+                  self.hourlyCollectionView.numberOfItems(inSection: 0) > 0 else {
                 return
             }
 
             self.hourlyCollectionView.layoutIfNeeded()
-            self.scrollHourlyCollection(to: index, animated: false)
-
-            if self.isSyncScrollingEnabled,
-               let dayOfYear = self.dayOfYear(for: hourly[index].time, timezone: location.timezone) {
-                self.currentScrollDayOfYear = dayOfYear
-            }
+            self.scrollHourlyCollection(to: 0, animated: false)
         }
+    }
+
+    private static func makeDisplayLocation(
+        from location: Location,
+        weather: Weather
+    ) -> (location: Location, sourceStartIndex: Int, signature: String) {
+        let slice = Self.displayHourlySlice(
+            hourly: weather.hourlyForecasts,
+            now: Date(),
+            timezone: location.timezone
+        )
+        let displayWeather = Weather(
+            base: weather.base,
+            current: weather.current,
+            yesterday: weather.yesterday,
+            dailyForecasts: weather.dailyForecasts,
+            hourlyForecasts: slice.items,
+            minutelyForecast: weather.minutelyForecast,
+            alerts: weather.alerts
+        )
+        let firstTime = slice.items.first?.time ?? 0.0
+        let lastTime = slice.items.last?.time ?? 0.0
+        let signature = [
+            location.formattedId,
+            "\(weather.base.timeStamp)",
+            "\(slice.sourceStartIndex)",
+            "\(slice.items.count)",
+            "\(firstTime)",
+            "\(lastTime)"
+        ].joined(separator: "|")
+        return (
+            location.copyOf(weather: displayWeather),
+            slice.sourceStartIndex,
+            signature
+        )
+    }
+
+    private static func displayHourlySlice(
+        hourly: [Hourly],
+        now: Date,
+        timezone: TimeZone
+    ) -> (items: [Hourly], sourceStartIndex: Int) {
+        guard !hourly.isEmpty else {
+            return ([], 0)
+        }
+        let startIndex = Self.currentHourlyIndex(
+            hourly: hourly,
+            now: now,
+            displayTimeZone: timezone
+        )
+        let startTime = hourly[startIndex].time
+        let endTime = startTime + 24.0 * 60.0 * 60.0
+        let rangeItems = hourly
+            .dropFirst(startIndex)
+            .prefix { item in
+                item.time < endTime
+            }
+        let items = Array(rangeItems)
+        if !items.isEmpty {
+            return (items, startIndex)
+        }
+        return (Array(hourly.dropFirst(startIndex).prefix(24)), startIndex)
+    }
+
+    private func sourceHourlyIndex(forDisplayIndex displayIndex: Int) -> Int {
+        let count = self.location?.weather?.hourlyForecasts.count ?? 0
+        guard count > 0 else {
+            return 0
+        }
+        return max(0, min(self.displayHourlySourceStartIndex + displayIndex, count - 1))
     }
 
     static func currentHourlyIndex(
@@ -791,13 +724,4 @@ class MainHourlyCardCell: MainTableViewCell,
         #endif
     }
 
-    private func dayOfYear(for time: TimeInterval, timezone: TimeZone) -> Int? {
-        var calendar = Calendar.current
-        calendar.timeZone = timezone
-        return calendar.ordinality(
-            of: .day,
-            in: .year,
-            for: Date(timeIntervalSince1970: time)
-        )
-    }
 }

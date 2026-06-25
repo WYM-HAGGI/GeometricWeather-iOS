@@ -17,6 +17,12 @@ import GeometricWeatherTheme
 class MainTrendShaderCollectionView: UICollectionView {
     
     private let scrollBar = MainTrendScrollBarView(frame: .zero)
+
+    var highlightsLeadingVisibleItem = false {
+        didSet {
+            self.setNeedsLayout()
+        }
+    }
     
     var cellSize: CGSize {
         return CGSize(
@@ -34,18 +40,32 @@ class MainTrendShaderCollectionView: UICollectionView {
     }
     
     var highlightIndex: Int {
-        guard self.numberOfItems(inSection: 0) > 0 else {
+        let itemCount = self.numberOfItems(inSection: 0)
+        guard itemCount > 0 else {
             return 0
+        }
+        if self.highlightsLeadingVisibleItem {
+            let maxOffsetX = max(0.0, self.contentSize.width - self.frame.width)
+            guard maxOffsetX > 0 else {
+                return self.isRtl ? itemCount - 1 : 0
+            }
+            let progress = min(1.0, max(0.0, self.contentOffset.x / maxOffsetX))
+            let rtlProgress = self.isRtl ? (1.0 - progress) : progress
+            return min(
+                itemCount - 1,
+                max(0, Int(round(rtlProgress * CGFloat(itemCount - 1))))
+            )
         }
         let rtlCenterX = self.isRtl
         ? (self.contentSize.width - self.scrollBar.center.x)
         : self.scrollBar.center.x
         // center positon / step-width, then cut the above value as int value.
-        return Int(
+        let index = Int(
             rtlCenterX / (
-                self.contentSize.width / Double(self.numberOfItems(inSection: 0))
+                self.contentSize.width / Double(itemCount)
             )
         )
+        return min(itemCount - 1, max(0, index))
     }
     
     // MARK: - life cycle.

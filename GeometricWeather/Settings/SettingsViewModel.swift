@@ -25,8 +25,6 @@ class SettingsViewModel: ObservableObject {
         of: SettingsManager.shared.darkMode
     ) ?? 0
     
-    @Published var trendSyncEnabled = SettingsManager.shared.trendSyncEnabled
-    
     // MARK: - unit.
     
     @Published var temperatureUnitIndex = TemperatureUnit.all.firstIndex(
@@ -75,10 +73,6 @@ class SettingsViewModel: ObservableObject {
         EventBus.shared.register(self, for: DarkModeChanged.self) { [weak self] event in
             self?.darkModeIndex = DarkMode.all.firstIndex(of: event.newValue) ?? 0
         }
-        EventBus.shared.register(self, for: TrendSyncEnabledChanged.self) { [weak self] event in
-            self?.trendSyncEnabled = event.newValue
-        }
-        
         // unit.
         
         EventBus.shared.register(self, for: TemperatureUnitChanged.self) { [weak self] event in

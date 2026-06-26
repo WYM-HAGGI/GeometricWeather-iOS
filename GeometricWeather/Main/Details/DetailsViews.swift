@@ -59,7 +59,7 @@ struct DetailsWeatherHeaderView: View {
             
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(
-                    self.weatherText
+                    getDisplayWeatherText(self.weatherText)
                     + ", "
                     + SettingsManager.shared.temperatureUnit.formatValueWithUnit(
                         self.temperature.temperature,

@@ -12,8 +12,7 @@ import GeometricWeatherSettings
 import GeometricWeatherDB
 import GeometricWeatherTheme
 
-private let circularProgressSize = 156.0
-private let linearProgressHeight = 36.0
+private let circularProgressSize = MainCardLayoutMetrics.airQualityCircularSize
 
 class MainAirQualityCardCell: MainTableViewCell {
     
@@ -39,7 +38,7 @@ class MainAirQualityCardCell: MainTableViewCell {
         
         self.hstack.axis = .horizontal
         self.hstack.alignment = .center
-        self.hstack.spacing = normalMargin
+        self.hstack.spacing = littleMargin
         self.cardContainer.contentView.addSubview(self.hstack)
         
         self.hstack.addArrangedSubview(self.circularProgressView)
@@ -48,17 +47,17 @@ class MainAirQualityCardCell: MainTableViewCell {
         self.hstack.addArrangedSubview(self.vstack)
         
         self.titleVibrancyContainer.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(normalMargin)
+            make.top.equalToSuperview().offset(MainCardLayoutMetrics.titleTopPadding)
             make.leading.equalToSuperview().offset(normalMargin)
             make.trailing.equalToSuperview().offset(-normalMargin)
         }
         self.hstack.snp.makeConstraints { make in
             make.top.equalTo(
                 self.titleVibrancyContainer.snp.bottom
-            ).offset(littleMargin)
+            ).offset(MainCardLayoutMetrics.sectionSpacing)
             make.leading.equalToSuperview().offset(normalMargin)
             make.trailing.equalToSuperview().offset(-normalMargin)
-            make.bottom.equalToSuperview().offset(-normalMargin)
+            make.bottom.equalToSuperview().offset(-MainCardLayoutMetrics.cardBottomPadding)
         }
         self.circularProgressView.snp.makeConstraints { make in
             make.size.equalTo(circularProgressSize)
@@ -160,7 +159,7 @@ class MainAirQualityCardCell: MainTableViewCell {
         for progressView in self.linearProgressViews {
             self.vstack.addArrangedSubview(progressView.view)
             progressView.view.snp.makeConstraints { make in
-                make.height.equalTo(44.0)
+                make.height.equalTo(MainCardLayoutMetrics.airQualityLinearRowHeight)
             }
         }
     }

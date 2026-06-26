@@ -23,8 +23,14 @@ public struct WeatherSource: ReadableOption {
         url: "caiyunapp.com",
         color: 0x5ebb8e
     )
+    public static let openMeteo = WeatherSource(
+        key: "weather_source_openmeteo",
+        voiceKey: "weather_source_voice_openmeteo",
+        url: "open-meteo.com",
+        color: 0x2f80ed
+    )
     
-    public static let all = [accu, caiYun]
+    public static let all = [openMeteo, accu, caiYun]
     
     public static subscript(index: Int) -> WeatherSource {
         get {

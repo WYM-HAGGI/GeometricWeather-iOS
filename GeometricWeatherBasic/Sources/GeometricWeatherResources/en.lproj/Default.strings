@@ -12,6 +12,9 @@
 "GeometricWeather" = "Geometric Weather";
 
 "current_location" = "Current location";
+"current_location_prefix" = "Current location: ";
+"data_location_prefix" = "Data location: ";
+"nearby_suffix" = " nearby";
 "resident_location" = "Resident location";
 "default_location" = "default location";
 "live" = "Live";
@@ -45,6 +48,12 @@
 "follow_system" = "Follow system";
 "background_information" = "Background information";
 "pressure" = "Atmospheric pressure";
+"altitude" = "Altitude";
+"approximate" = "about";
+"altitude_format" = "Altitude %.0f m";
+"altitude_approx_format" = "Altitude about %.0f m";
+"pressure_source_device" = "device";
+"pressure_source_weather" = "weather source";
 "visibility" = "Visibility";
 "dew_point" = "Dew point";
 "cloud_cover" = "Cloud cover";
@@ -97,6 +106,8 @@
 "weather_dust" = "Dust";
 "weather_sand" = "Sand";
 "weather_wind" = "Wind";
+"weather_thunder" = "Thunder";
+"weather_thunderstorm" = "Thunderstorm";
 
 "wind_0" = "Calm";
 "wind_1" = "Light air";
@@ -159,6 +170,33 @@
 "hourly_overview" = "Hourly forecast";
 "minutely_overview" = "Minutely forecast";
 "precipitation_overview" = "Precipitation forecast";
+"hourly_notice_precipitation_title" = "Rain expected soon";
+"hourly_notice_thunderstorm_title" = "Thunderstorm";
+"hourly_notice_wind_title" = "Wind alert";
+"hourly_notice_weather_alert_title" = "Weather alert";
+"hourly_notice_severe_weather_title" = "Severe weather";
+"hourly_notice_precipitation_subtitle" = "Precipitation may occur in the next 60 minutes.";
+"hourly_notice_thunderstorm_subtitle" = "Thunderstorms may occur soon. Stay safe.";
+"hourly_notice_wind_subtitle" = "Strong winds are possible soon.";
+"hourly_notice_weather_alert_subtitle" = "Active weather alerts are in effect.";
+"hourly_notice_severe_weather_subtitle" = "Severe weather may occur soon.";
+"weather_alert" = "Weather alert";
+"weather_alert_type_heavy_rain" = "Rainstorm alert";
+"weather_alert_type_thunderstorm" = "Thunderstorm and gale alert";
+"weather_alert_type_strong_wind" = "Strong wind alert";
+"weather_alert_type_high_temperature" = "High temperature alert";
+"weather_alert_type_low_temperature" = "Cold wave alert";
+"weather_alert_type_fog" = "Fog alert";
+"weather_alert_type_hail" = "Hail alert";
+"weather_alert_type_freezing" = "Road icing alert";
+"weather_alert_type_heavy_snow" = "Snowstorm alert";
+"weather_alert_type_typhoon" = "Typhoon alert";
+"weather_alert_type_sandstorm" = "Sandstorm alert";
+"weather_alert_title_format" = "%2$@ %1$@";
+"weather_alert_severity_blue" = "Blue";
+"weather_alert_severity_yellow" = "Yellow";
+"weather_alert_severity_orange" = "Orange";
+"weather_alert_severity_red" = "Red";
 "air_quality" = "Air quality";
 "allergen" = "Allergen";
 "life_details" = "Details";
@@ -316,8 +354,6 @@
 "settings_title_trend_horizontal_line_switch" = "Horizontal lines in trend";
 "settings_title_exchange_day_night_temp_switch" = "Exchange day night temperature";
 "settings_title_card_order" = "Card order";
-"settings_title_trend_sync" = "Synergistic scrolling";
-"settings_summary_trend_sync" = "Synergistic scrolling between daily and hourly trends";
 "settings_title_unit" = "Units";
 "settings_summary_unit" = "Set the unit of weather data";
 "settings_title_temperature_unit" = "Temperature unit";
@@ -339,16 +375,36 @@
 "settings_title_notification" = "Send Notification";
 
 "weather_source_cn" = "weather.com.cn (Only For China)";
+"weather_source_openmeteo" = "Open-Meteo";
 "weather_source_caiyun" = "caiyunapp.com (Only For China)";
 "weather_source_accu" = "accuweather.com";
 "weather_source_owm" = "OpenWeather";
 "weather_source_mf" = "Météo France";
 
 "weather_source_voice_cn" = "weather.com.CN";
+"weather_source_voice_openmeteo" = "Open Meteo";
 "weather_source_voice_caiyun" = "CaiYun App.com";
 "weather_source_voice_accu" = "ACCU weather.com";
 "weather_source_voice_owm" = "Open Weather";
 "weather_source_voice_mf" = "Météo France";
+
+"openmeteo_weather_mainly_clear" = "Mainly Clear";
+"openmeteo_weather_rime_fog" = "Rime Fog";
+"openmeteo_weather_drizzle_light" = "Light Drizzle";
+"openmeteo_weather_drizzle_moderate" = "Moderate Drizzle";
+"openmeteo_weather_drizzle_heavy" = "Heavy Drizzle";
+"openmeteo_weather_freezing_drizzle_light" = "Light Freezing Drizzle";
+"openmeteo_weather_freezing_drizzle_heavy" = "Heavy Freezing Drizzle";
+"openmeteo_weather_freezing_rain_light" = "Light Freezing Rain";
+"openmeteo_weather_freezing_rain_heavy" = "Heavy Freezing Rain";
+"openmeteo_weather_snow_grains" = "Snow Grains";
+"openmeteo_weather_rain_showers_light" = "Light Rain Showers";
+"openmeteo_weather_rain_showers_moderate" = "Moderate Rain Showers";
+"openmeteo_weather_rain_showers_heavy" = "Heavy Rain Showers";
+"openmeteo_weather_snow_showers_light" = "Light Snow Showers";
+"openmeteo_weather_snow_showers_heavy" = "Heavy Snow Showers";
+"openmeteo_weather_thunderstorm_light_hail" = "Thunderstorm with Light Hail";
+"openmeteo_weather_thunderstorm_heavy_hail" = "Thunderstorm with Heavy Hail";
 
 "dark_mode_auto" = "Automatic";
 "dark_mode_system" = "Follow system";

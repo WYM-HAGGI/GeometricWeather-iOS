@@ -2,6 +2,8 @@
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
+.DS_Store
+
 ## User settings
 xcuserdata/
 
@@ -11,7 +13,10 @@ xcuserdata/
 
 ## compatibility with Xcode 3 and earlier (ignoring not required starting Xcode 4)
 build/
+Build/
 DerivedData/
+.derivedData/
+.derivedData-*/
 *.moved-aside
 *.pbxuser
 !default.pbxuser
@@ -66,4 +71,20 @@ fastlane/test_output
 # https://github.com/johnno1962/injectionforxcode
 
 iOSInjectionProject/
-{"mode":"full","isActive":false}
+
+# Local API keys. Keep real service keys out of git.
+Config/LocalConfig.xcconfig
+*.local.xcconfig
+.env
+.env.*
+
+# SwiftPM
+.swiftpm/
+
+# CocoaPods generated local metadata
+Pods/Pods.xcodeproj/xcuserdata/
+Pods/Pods.xcodeproj/xcshareddata/
+
+# Xcode local state
+*.xcuserstate
+*.xcuserdata/

@@ -22,7 +22,14 @@ func updateLiveActivity(locations: [Location]) {
         return
     }
     Task {
-        try await updateLiveActivity(for: location)
+        do {
+            try await updateLiveActivity(for: location)
+        } catch {
+            printLog(
+                keyword: "liveActivity",
+                content: "Catched an error \"\(error.localizedDescription)\" when updating live activity for \(location.formattedId)"
+            )
+        }
     }
 }
 
@@ -37,17 +44,25 @@ private func updateLiveActivity(for location: Location) async throws {
         if !SettingsManager.shared.dynamicIslandEnabled {
             return
         }
+        guard let reason = await LiveActivityWeatherEligibility.reason(
+            for: location,
+            alertProvider: WeatherAlertProviderBridge.fallbackProvider
+        ) else {
+            printLog(
+                keyword: "liveActivity",
+                content: "Ended live activity and skipped request because no eligible weather event exists for \(location.formattedId)"
+            )
+            return
+        }
         guard
             let base = location.weather?.base,
             let current = location.weather?.current,
-            let today = location.weather?.dailyForecasts.get(0),
-            let minutely = location.weather?.minutelyForecast
+            let today = location.weather?.dailyForecasts.get(0)
         else {
             return
         }
-        if !minutely.isValid {
-            return
-        }
+        let minutely = location.weather?.minutelyForecast
+            ?? LiveActivityWeatherEligibility.fallbackMinutely(for: location)
         
         let deadline = Date(
             timeIntervalSince1970: minutely.endTime - Double(
@@ -77,7 +92,7 @@ private func updateLiveActivity(for location: Location) async throws {
                     isCurrentPosition: location.currentPosition,
                     timestamp: base.timeStamp,
                     timezone: location.timezone,
-                    weatherText: current.weatherText,
+                    weatherText: getDisplayWeatherText(current.weatherText),
                     weatherCode: current.weatherCode,
                     temperature: current.temperature.temperature,
                     daytimeTemperature: today.day.temperature.temperature,
@@ -91,7 +106,7 @@ private func updateLiveActivity(for location: Location) async throws {
             )
             printLog(
                 keyword: "liveActivity",
-                content: "Requested a live activity for \(location.formattedId)"
+                content: "Requested a live activity for \(location.formattedId), reason: \(reason)"
             )
         } catch (let error) {
             printLog(

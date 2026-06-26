@@ -124,10 +124,8 @@ class LocationWeatherItemView: UIView {
             daylight: location.isDaylight
         )
         self.residientIcon.alpha = location.residentPosition ? 1 : 0
-        self.titleLabel1.text = location.currentPosition
-        ? getLocalizedText("current_location")
-        : getLocationText(location: location)
-        self.titleLabel2.text = weather.current.weatherText
+        self.titleLabel1.text = getLocationText(location: location)
+        self.titleLabel2.text = getDisplayWeatherText(weather.current.weatherText)
         + ", "
         + SettingsManager.shared.temperatureUnit.formatValueWithUnit(
             weather.current.temperature.temperature,

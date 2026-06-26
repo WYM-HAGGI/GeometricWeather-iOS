@@ -1,0 +1,4 @@
+#include "../Pods/Target Support Files/Pods-GeometricWeather/Pods-GeometricWeather.release.xcconfig"
+
+AMAP_API_KEY =
+#include? "LocalConfig.xcconfig"

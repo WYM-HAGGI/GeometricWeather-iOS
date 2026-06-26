@@ -1,0 +1,4 @@
+// Copy this file to LocalConfig.xcconfig and put your local keys there.
+// LocalConfig.xcconfig is ignored by git.
+
+AMAP_API_KEY =

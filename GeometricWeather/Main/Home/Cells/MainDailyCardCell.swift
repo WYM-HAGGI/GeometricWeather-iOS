@@ -8,19 +8,14 @@
 import UIKit
 import GeometricWeatherCore
 import GeometricWeatherResources
-import GeometricWeatherSettings
 import GeometricWeatherDB
 import GeometricWeatherTheme
 import SwiftUI
 
-private let dailyTrendViewHeight = 286
+private let dailyTrendViewHeight = MainCardLayoutMetrics.dailyTrendHeight
 
 struct DailyTrendCellTapAction {
     let index: Int
-}
-
-struct DailyTrendManuallyScrollEvent {
-    let targetDayOfYear: Int
 }
 
 class MainDailyCardCell: MainTableViewCell,
@@ -40,12 +35,6 @@ class MainDailyCardCell: MainTableViewCell,
     // MARK: - data.
     
     private var validTrendGenerators = [MainTrendGeneratorProtocol]()
-    
-    private let selectionReactor = UISelectionFeedbackGenerator()
-    private var isChangingDailyCollectionViewScrollOffsetManually = false
-    private var isDraggingDailyCollectionView = false
-    private var currentScrollDayOfYear = -1
-    private var isSyncScrollingEnabled = false
     
     // MARK: - life cycle.
     
@@ -74,7 +63,7 @@ class MainDailyCardCell: MainTableViewCell,
         self.cardContainer.contentView.addSubview(self.dailyBackgroundView)
         
         self.titleVibrancyContainer.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(littleMargin)
+            make.top.equalToSuperview().offset(MainCardLayoutMetrics.titleTopPadding)
             make.leading.equalToSuperview().offset(normalMargin)
             make.trailing.equalToSuperview().offset(-normalMargin)
         }
@@ -84,17 +73,17 @@ class MainDailyCardCell: MainTableViewCell,
             make.trailing.equalToSuperview().offset(-normalMargin)
         }
         self.dailyTagView.snp.makeConstraints { make in
-            make.top.equalTo(self.summaryLabel.snp.bottom).offset(littleMargin)
+            make.top.equalTo(self.summaryLabel.snp.bottom).offset(MainCardLayoutMetrics.sectionSpacing)
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
-            make.height.equalTo(44)
+            make.height.equalTo(MainCardLayoutMetrics.tagHeight)
         }
         self.dailyBackgroundView.snp.makeConstraints { make in
-            make.top.equalTo(self.dailyTagView.snp.bottom).offset(littleMargin)
+            make.top.equalTo(self.dailyTagView.snp.bottom).offset(MainCardLayoutMetrics.sectionSpacing)
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
             make.height.equalTo(dailyTrendViewHeight)
-            make.bottom.equalToSuperview().offset(-normalMargin)
+            make.bottom.equalToSuperview().offset(-MainCardLayoutMetrics.cardBottomPadding)
         }
         self.dailyCollectionView.snp.makeConstraints { make in
             make.top.equalTo(self.dailyBackgroundView.snp.top)
@@ -117,7 +106,7 @@ class MainDailyCardCell: MainTableViewCell,
     
     override func bindData(location: Location, timeBar: MainTimeBarView?) {
         super.bindData(location: location, timeBar: timeBar)
-        self.isSyncScrollingEnabled = SettingsManager.shared.trendSyncEnabled
+        self.summaryLabel.textColor = self.readableCardSecondaryTextColor()
         
         guard let weather = location.weather else {
             return
@@ -138,20 +127,6 @@ class MainDailyCardCell: MainTableViewCell,
                 at: .start,
                 animated: false
             )
-            
-            if self.isSyncScrollingEnabled {
-                self.currentScrollDayOfYear = Calendar.current.ordinality(
-                    of: .day,
-                    in: .year,
-                    for: Date(
-                        timeIntervalSince1970: location
-                            .weather?
-                            .dailyForecasts
-                            .get(0)?
-                            .time ?? 0.0
-                    )
-                ) ?? -1
-            }
         }
     }
     
@@ -159,6 +134,7 @@ class MainDailyCardCell: MainTableViewCell,
         _ previousTraitCollection: UITraitCollection?
     ) {
         super.traitCollectionDidChange(previousTraitCollection)
+        self.summaryLabel.textColor = self.readableCardSecondaryTextColor()
         DispatchQueue.main.async {
             self.dailyCollectionView.reloadData()
         }
@@ -167,22 +143,6 @@ class MainDailyCardCell: MainTableViewCell,
     @objc private func onDeviceOrientationChanged() {
         if !self.dailyCollectionView.indexPathsForVisibleItems.isEmpty {
             self.dailyCollectionView.reloadData()
-        }
-    }
-    
-    override func willMove(toWindow newWindow: UIWindow?) {
-        self.window?
-            .windowScene?
-            .eventBus
-            .unregister(self, for: HourlyTrendManuallyScrollEvent.self)
-    }
-    
-    override func didMoveToWindow() {
-        self.window?.windowScene?.eventBus.register(
-            self,
-            for: HourlyTrendManuallyScrollEvent.self
-        ) { [weak self] event in
-            self?.respondSynchronizeScrolling(for: event)
         }
     }
     
@@ -217,90 +177,8 @@ class MainDailyCardCell: MainTableViewCell,
     
     // MARK: - scroll view delegate.
     
-    private func respondSynchronizeScrolling(
-        for event: HourlyTrendManuallyScrollEvent
-    ) {
-        if self.isDraggingDailyCollectionView {
-            return
-        }
-        guard let index = self.location?.weather?.dailyForecasts.firstIndex(where: { item in
-            Calendar.current.ordinality(
-                of: .day,
-                in: .year,
-                for: Date(timeIntervalSince1970: item.time)
-            ) == event.targetDayOfYear
-        }) else {
-            return
-        }
-        
-        self.dailyCollectionView.scrollAligmentlyToScrollBar(
-            at: IndexPath(row: index, section: 0),
-            animated: true
-        )
-        self.currentScrollDayOfYear = event.targetDayOfYear
-        self.selectionReactor.selectionChanged()
-    }
-    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if !self.isSyncScrollingEnabled {
-            return
-        }
-        if !self.isChangingDailyCollectionViewScrollOffsetManually {
-            return
-        }
-        guard let daily = self.location?.weather?.dailyForecasts.get(
-            self.dailyCollectionView.highlightIndex
-        ) else {
-            return
-        }
-        guard let dayOfYear = Calendar.current.ordinality(
-            of: .day,
-            in: .year,
-            for: Date(timeIntervalSince1970: daily.time)
-        ) else {
-            return
-        }
-        
-        if self.currentScrollDayOfYear != dayOfYear {
-            self.currentScrollDayOfYear = dayOfYear
-            
-            self.window?.windowScene?.eventBus.post(
-                DailyTrendManuallyScrollEvent(targetDayOfYear: dayOfYear)
-            )
-        }
-    }
-    
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        self.isChangingDailyCollectionViewScrollOffsetManually = true
-        self.isDraggingDailyCollectionView = true
-    }
-    
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if !decelerate {
-            self.isChangingDailyCollectionViewScrollOffsetManually = false
-        }
-        self.isDraggingDailyCollectionView = false
-        
-        if !decelerate && self.isSyncScrollingEnabled {
-            self.dailyCollectionView.scrollAligmentlyToScrollBar(
-                at: IndexPath(row: self.dailyCollectionView.highlightIndex, section: 0),
-                animated: true
-            )
-        }
-    }
-    
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        self.isChangingDailyCollectionViewScrollOffsetManually = false
-        
-        if !self.isSyncScrollingEnabled
-            || scrollView.contentOffset.x <= 0
-            || scrollView.contentOffset.x + scrollView.frame.width >= scrollView.contentSize.width {
-            return
-        }
-        self.dailyCollectionView.scrollAligmentlyToScrollBar(
-            at: IndexPath(row: self.dailyCollectionView.highlightIndex, section: 0),
-            animated: true
-        )
+        scrollView.setNeedsLayout()
     }
     
     // MARK: - collection view delegate.
@@ -438,19 +316,5 @@ class MainDailyCardCell: MainTableViewCell,
             )
         }
         
-        if !self.isSyncScrollingEnabled {
-            return
-        }
-        if let daily = self.location?.weather?.dailyForecasts.first,
-           let dayOfYear = Calendar.current.ordinality(
-            of: .day,
-            in: .year,
-            for: Date(timeIntervalSince1970: daily.time)
-           ) {
-            self.currentScrollDayOfYear = dayOfYear
-            self.window?.windowScene?.eventBus.post(
-                DailyTrendManuallyScrollEvent(targetDayOfYear: dayOfYear)
-            )
-        }
     }
 }

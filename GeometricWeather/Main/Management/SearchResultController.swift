@@ -114,8 +114,12 @@ class SearchResultController: GeoViewController<Bool>,
         self.requesting.value = true
         
         let query = self.decodeSearchQuery(text)
-        let api = self.weatherApiDict[query.weatherSource]
-        ?? self.weatherApiDict.first!.value
+        guard let api = self.weatherApiDict[query.weatherSource] ?? self.weatherApiDict.first?.value else {
+            self.requesting.value = false
+            self.locationList = []
+            self.tableView.reloadData()
+            return
+        }
         
         api.getLocation(query.query) { [weak self] locations in
             guard let strongSelf = self else {
@@ -141,7 +145,7 @@ class SearchResultController: GeoViewController<Bool>,
     ) -> (query: String, weatherSource: WeatherSource) {
         // for example: $accu$   South of market --> South of market in accuweather.com
         let pattern = "^\\$.*\\$"
-        let range = NSRange(location: 0, length: text.count)
+        let range = NSRange(location: 0, length: text.utf16.count)
         
         do {
             let regex = try NSRegularExpression(pattern: pattern)
@@ -208,7 +212,9 @@ class SearchResultController: GeoViewController<Bool>,
             for: indexPath
         )
         (cell as? SearchTableViewCell)?.bindData(
-            location: self.locationList[indexPath.row],
+            location: self.locationList.get(indexPath.row) ?? Location.buildLocal(
+                weatherSource: SettingsManager.shared.weatherSource
+            ),
             selected: false
         )
         return cell
@@ -220,10 +226,18 @@ class SearchResultController: GeoViewController<Bool>,
     ) {
         tableView.deselectRow(at: indexPath, animated: true)
 
-        self.view.window?.windowScene?.eventBus.post(
-            AddLocationEvent(
-                location: self.locationList[indexPath.row]
+        guard let location = self.locationList.get(indexPath.row),
+              location.latitude.isFinite,
+              location.longitude.isFinite else {
+            ToastHelper.showToastMessage(
+                getLocalizedText("feedback_search_nothing"),
+                inWindowOf: self.view
             )
+            return
+        }
+        
+        self.view.window?.windowScene?.eventBus.post(
+            AddLocationEvent(location: location)
         )
     }
     

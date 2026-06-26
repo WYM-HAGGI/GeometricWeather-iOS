@@ -130,6 +130,15 @@ public extension Bundle {
 
 // MARK: - text.
 
+private let locationDetailTextUserDefaultsPrefix = "location_detail_text_"
+private let locationSearchTitleUserDefaultsPrefix = "location_search_title_"
+private let locationSearchSubtitleUserDefaultsPrefix = "location_search_subtitle_"
+
+public struct LocationSearchDisplayText {
+    public let title: String
+    public let subtitle: String?
+}
+
 public func getLocalizedText(_ key: String) -> String {
     let defaultValue = NSLocalizedString(
         key,
@@ -139,48 +148,189 @@ public func getLocalizedText(_ key: String) -> String {
         comment: ""
     )
     
-    return NSLocalizedString(
+    let localized = NSLocalizedString(
         key,
         tableName: nil,
         bundle: .shared,
         value: defaultValue,
         comment: ""
     )
+    if localized == key || localized.isEmpty {
+        return key
+            .replacingOccurrences(of: "openmeteo_weather_", with: "")
+            .replacingOccurrences(of: "weather_", with: "")
+            .replacingOccurrences(of: "_", with: " ")
+            .capitalized
+    }
+    return localized
+}
+
+public func getDisplayWeatherText(_ text: String) -> String {
+    if text.hasPrefix("weather_") || text.hasPrefix("openmeteo_weather_") {
+        return getLocalizedText(text)
+    }
+    return text
+}
+
+public func locationHasResolvedAddress(_ location: Location) -> Bool {
+    if getStoredLocationDetailText(location: location) != nil {
+        return true
+    }
+    
+    return cleanLocationPart(location.country) != nil
+        || cleanLocationPart(location.province) != nil
+        || cleanLocationPart(location.city) != nil
+        || cleanLocationPart(location.district) != nil
 }
 
 public func getLocationText(location: Location) -> String {
-    var text = ""
+    let city = cleanLocationPart(location.city)
+    let district = cleanLocationPart(location.district)
+    let province = cleanLocationPart(location.province)
     
-    if !location.district.isEmpty {
-        text = location.district
-    } else if !location.city.isEmpty {
-        text = location.city
-    } else if !location.province.isEmpty {
-        text = location.province
-    } else if location.currentPosition {
-        text = getLocalizedText("current_location")
+    if let city = city, let district = district, city != district {
+        return joinLocationParts([city, district], compact: shouldCompactLocationText(location))
+    }
+    if let city = city {
+        return city
+    }
+    if let province = province, let city = city, province != city {
+        return joinLocationParts([province, city], compact: shouldCompactLocationText(location))
+    }
+    if let province = province {
+        return province
+    }
+    if location.currentPosition {
+        return getLocalizedText("current_location")
+    }
+    return cleanLocationPart(location.country) ?? getLocalizedText("current_location")
+}
+
+public func getLocationDetailText(location: Location) -> String? {
+    if let detail = getStoredLocationDetailText(location: location) {
+        return detail
     }
     
-    if !text.hasSuffix(")") {
-        return text
+    let country = cleanLocationPart(location.country)
+    let province = cleanLocationPart(location.province)
+    let city = cleanLocationPart(location.city)
+    let district = cleanLocationPart(location.district)
+    let compact = shouldCompactLocationText(location)
+    
+    if province != nil || city != nil || district != nil {
+        return joinLocationParts(
+            [province, city, district],
+            compact: compact
+        )
     }
-    guard let deleteBegin = text.lastIndex(of: "(") else {
-        return text
+    if country != nil || city != nil {
+        return joinLocationParts(
+            [country, city],
+            compact: compact
+        )
     }
-    return String(text[..<deleteBegin])
+    return nil
+}
+
+public func saveLocationDetailText(location: Location, detail: String?) {
+    let key = locationDetailTextUserDefaultsPrefix + location.formattedId
+    guard let detail = detail?.trimmingCharacters(in: .whitespacesAndNewlines), !detail.isEmpty else {
+        UserDefaults.standard.removeObject(forKey: key)
+        return
+    }
+    
+    UserDefaults.standard.set(detail, forKey: key)
+}
+
+public func saveLocationSearchDisplayText(location: Location, title: String?, subtitle: String?) {
+    let titleKey = locationSearchTitleUserDefaultsPrefix + location.formattedId
+    let subtitleKey = locationSearchSubtitleUserDefaultsPrefix + location.formattedId
+    
+    if let title = title?.trimmingCharacters(in: .whitespacesAndNewlines), !title.isEmpty {
+        UserDefaults.standard.set(title, forKey: titleKey)
+    } else {
+        UserDefaults.standard.removeObject(forKey: titleKey)
+    }
+    
+    if let subtitle = subtitle?.trimmingCharacters(in: .whitespacesAndNewlines), !subtitle.isEmpty {
+        UserDefaults.standard.set(subtitle, forKey: subtitleKey)
+    } else {
+        UserDefaults.standard.removeObject(forKey: subtitleKey)
+    }
+}
+
+public func getLocationSearchDisplayText(location: Location) -> LocationSearchDisplayText? {
+    let titleKey = locationSearchTitleUserDefaultsPrefix + location.formattedId
+    let subtitleKey = locationSearchSubtitleUserDefaultsPrefix + location.formattedId
+    guard let title = UserDefaults.standard.string(forKey: titleKey)?.trimmingCharacters(in: .whitespacesAndNewlines),
+          !title.isEmpty else {
+        return nil
+    }
+    
+    let subtitle = UserDefaults.standard.string(forKey: subtitleKey)?.trimmingCharacters(in: .whitespacesAndNewlines)
+    return LocationSearchDisplayText(
+        title: title,
+        subtitle: subtitle?.isEmpty == false ? subtitle : nil
+    )
+}
+
+private func getStoredLocationDetailText(location: Location) -> String? {
+    let key = locationDetailTextUserDefaultsPrefix + location.formattedId
+    guard let text = UserDefaults.standard.string(forKey: key)?.trimmingCharacters(in: .whitespacesAndNewlines),
+          !text.isEmpty else {
+        return nil
+    }
+    return text
+}
+
+private func cleanLocationPart(_ text: String?) -> String? {
+    guard var text = text?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else {
+        return nil
+    }
+    
+    if text.hasSuffix(")"), let deleteBegin = text.lastIndex(of: "(") {
+        text = String(text[..<deleteBegin])
+    }
+    if text == getLocalizedText("current_location") {
+        return nil
+    }
+    return text.isEmpty ? nil : text
+}
+
+private func joinLocationParts(_ parts: [String?], compact: Bool) -> String {
+    var result = [String]()
+    for part in parts {
+        guard let part = part, !result.contains(part) else {
+            continue
+        }
+        result.append(part)
+    }
+    return result.joined(separator: compact ? "" : ", ")
+}
+
+private func shouldCompactLocationText(_ location: Location) -> Bool {
+    return [location.country, location.province, location.city, location.district].contains { text in
+        text.range(of: "\\p{Han}", options: .regularExpression) != nil
+    }
 }
 
 public func getWeekText(_ daily: Daily) -> String {
     return getLocalizedText("week_\(daily.week)")
 }
 
-public func getHourText(_ hourly: Hourly) -> String {
+public func getHourText(_ hourly: Hourly, timezone: TimeZone = .current) -> String {
     if isTwelveHour() {
         let formatter = DateFormatter()
         formatter.dateFormat = "h aa"
+        formatter.timeZone = timezone
         return formatter.string(from: Date(timeIntervalSince1970: hourly.time))
     } else {
-        return String(hourly.getHour(inTwelveHourFormat: false)) + getLocalizedText("of_clock")
+        return String(
+            hourly.getHour(
+                inTwelveHourFormat: false,
+                timezone: timezone
+            )
+        ) + getLocalizedText("of_clock")
     }
 }
 

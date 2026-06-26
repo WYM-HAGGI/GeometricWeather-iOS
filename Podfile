@@ -7,11 +7,6 @@ target 'GeometricWeather' do
 
   # Pods for GeometricWeather
   
-  # moya.
-  pod 'Moya', '~> 15.0'
-  pod 'Moya/RxSwift', '~> 15.0'
-  pod 'Moya/ReactiveSwift', '~> 15.0'
-  
   # snapkit.
   pod 'SnapKit', '~> 5.0.0'
   
@@ -36,7 +31,7 @@ post_install do |installer|
     installer.generated_projects.each do |project|
           project.targets.each do |target|
               target.build_configurations.each do |config|
-                  config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
+                  config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
                end
           end
    end

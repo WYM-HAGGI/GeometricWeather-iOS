@@ -12,12 +12,12 @@ import GeometricWeatherResources
 extension UserDefaults {
     
     private static let suiteInstance = UserDefaults(
-        suiteName: "group.wangdaye.com.GeometricWeather"
+        suiteName: "group.com.haggi.geometricweather.test"
     )
     
     static var shared: UserDefaults {
         get {
-            return Self.suiteInstance ?? Self.shared
+            return Self.suiteInstance ?? .standard
         }
     }
 }

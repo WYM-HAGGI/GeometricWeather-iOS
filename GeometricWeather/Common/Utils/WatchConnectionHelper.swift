@@ -27,11 +27,20 @@ class WatchConnectionHelper: NSObject,
     
     private var isHandshaking = false
     private var pendingRunnable = [() -> Void]()
+    private var lastWatchSyncSkipLogTime: Date?
+    private let watchSyncSkipLogInterval: TimeInterval = 5.0 * 60.0
     
     // MARK: - connectivity.
     
     var isConnecting: Bool {
         return self.session.activationState == .activated
+    }
+    
+    private var canSyncToWatch: Bool {
+        return WCSession.isSupported()
+        && self.session.activationState == .activated
+        && self.session.isPaired
+        && self.session.isWatchAppInstalled
     }
     
     func checkToHandshake() {
@@ -57,11 +66,17 @@ class WatchConnectionHelper: NSObject,
     func shareLocationUpdateResult(locations: [Location]) {
         self.checkToHandshake()
         
-        if !self.isHandshaking && !self.isConnecting {
+        if !self.isHandshaking && !self.canSyncToWatch {
+            self.logWatchSyncSkippedIfNeeded()
             return
         }
         
-        self.executeOrPending {
+        self.executeOrPending { [self] in
+            guard self.canSyncToWatch else {
+                self.logWatchSyncSkippedIfNeeded()
+                return
+            }
+            
             let model = SharedLocationUpdateResult(locations: locations)
             
             do {
@@ -81,6 +96,11 @@ class WatchConnectionHelper: NSObject,
     }
     
     private func shareLocationUpdateResultOnBackground(data: Data) {
+        guard self.canSyncToWatch else {
+            self.logWatchSyncSkippedIfNeeded()
+            return
+        }
+        
         do {
             try self.session.updateApplicationContext(
                 try JSONSerialization.jsonObject(
@@ -94,6 +114,22 @@ class WatchConnectionHelper: NSObject,
                 content: "Error when background updating location update result: \(error)"
             )
         }
+    }
+    
+    private func logWatchSyncSkippedIfNeeded() {
+        #if DEBUG
+        let now = Date()
+        if let lastWatchSyncSkipLogTime = self.lastWatchSyncSkipLogTime,
+           now.timeIntervalSince(lastWatchSyncSkipLogTime) < self.watchSyncSkipLogInterval {
+            return
+        }
+        
+        self.lastWatchSyncSkipLogTime = now
+        printLog(
+            keyword: "watchConnection",
+            content: "Skipped Watch sync because Watch app is not installed or session is not activated."
+        )
+        #endif
     }
     
     // MARK: - watch connectivity session delegate.

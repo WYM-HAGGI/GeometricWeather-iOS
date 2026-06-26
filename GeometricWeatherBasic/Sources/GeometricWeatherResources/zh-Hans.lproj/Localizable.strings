@@ -9,6 +9,9 @@
 "GeometricWeather" = "几何天气";
 
 "current_location" = "当前位置";
+"current_location_prefix" = "当前定位：";
+"data_location_prefix" = "数据位置：";
+"nearby_suffix" = "附近";
 "resident_location" = "常驻位置";
 "default_location" = "默认位置";
 "live" = "实时";
@@ -42,6 +45,12 @@
 "follow_system" = "跟随系统";
 "background_information" = "后台信息";
 "pressure" = "大气压强";
+"altitude" = "海拔";
+"approximate" = "约";
+"altitude_format" = "海拔 %.0f m";
+"altitude_approx_format" = "海拔约 %.0f m";
+"pressure_source_device" = "设备";
+"pressure_source_weather" = "天气源";
 "visibility" = "能见度";
 "dew_point" = "露点";
 "cloud_cover" = "云量";
@@ -94,6 +103,8 @@
 "weather_dust" = "浮尘";
 "weather_sand" = "沙尘";
 "weather_wind" = "大风";
+"weather_thunder" = "雷电";
+"weather_thunderstorm" = "雷暴";
 
 "wind_0" = "无风";
 "wind_1" = "一级";
@@ -156,6 +167,33 @@
 "hourly_overview" = "小时概览";
 "minutely_overview" = "分钟概览";
 "precipitation_overview" = "降水预报";
+"hourly_notice_precipitation_title" = "即将有降水";
+"hourly_notice_thunderstorm_title" = "雷暴天气";
+"hourly_notice_wind_title" = "大风提醒";
+"hourly_notice_weather_alert_title" = "天气预警";
+"hourly_notice_severe_weather_title" = "强天气提醒";
+"hourly_notice_precipitation_subtitle" = "未来 60 分钟可能出现降水，请留意出行。";
+"hourly_notice_thunderstorm_subtitle" = "未来短时可能出现雷暴，请注意安全。";
+"hourly_notice_wind_subtitle" = "未来短时风力较大，请注意户外安全。";
+"hourly_notice_weather_alert_subtitle" = "当前地区存在有效天气预警。";
+"hourly_notice_severe_weather_subtitle" = "未来短时可能出现强降水或恶劣天气。";
+"weather_alert" = "天气预警";
+"weather_alert_type_heavy_rain" = "暴雨预警";
+"weather_alert_type_thunderstorm" = "雷暴大风预警";
+"weather_alert_type_strong_wind" = "大风预警";
+"weather_alert_type_high_temperature" = "高温预警";
+"weather_alert_type_low_temperature" = "寒潮预警";
+"weather_alert_type_fog" = "大雾预警";
+"weather_alert_type_hail" = "冰雹预警";
+"weather_alert_type_freezing" = "道路结冰预警";
+"weather_alert_type_heavy_snow" = "暴雪预警";
+"weather_alert_type_typhoon" = "台风预警";
+"weather_alert_type_sandstorm" = "沙尘暴预警";
+"weather_alert_title_format" = "%2$@%1$@";
+"weather_alert_severity_blue" = "蓝色";
+"weather_alert_severity_yellow" = "黄色";
+"weather_alert_severity_orange" = "橙色";
+"weather_alert_severity_red" = "红色";
 "air_quality" = "空气质量";
 "allergen" = "过敏原";
 "life_details" = "详情数据";
@@ -311,8 +349,6 @@
 "settings_title_daily_trend_display" = "每日趋势顺序";
 "settings_title_trend_horizontal_line_switch" = "趋势图横线";
 "settings_title_exchange_day_night_temp_switch" = "交换日间夜间温度";
-"settings_title_trend_sync" = "协同滚动";
-"settings_summary_trend_sync" = "在每日趋势和小时趋势之间启用协同滚动";
 "settings_title_unit" = "单位";
 "settings_summary_unit" = "设置天气数据的单位";
 "settings_title_temperature_unit" = "温度单位";
@@ -333,16 +369,36 @@
 "settings_title_notification" = "开启天气通知";
 
 "weather_source_cn" = "weather.com.cn (仅中国有效)";
+"weather_source_openmeteo" = "Open-Meteo";
 "weather_source_caiyun" = "caiyunapp.com (仅中国有效)";
 "weather_source_accu" = "accuweather.com";
 "weather_source_owm" = "OpenWeather";
 "weather_source_mf" = "Météo France";
 
 "weather_source_voice_cn" = "weather.com.CN";
+"weather_source_voice_openmeteo" = "Open Meteo";
 "weather_source_voice_caiyun" = "CaiYun App.com";
 "weather_source_voice_accu" = "ACCU weather.com";
 "weather_source_voice_owm" = "Open Weather";
 "weather_source_voice_mf" = "Météo France";
+
+"openmeteo_weather_mainly_clear" = "主要晴朗";
+"openmeteo_weather_rime_fog" = "雾凇";
+"openmeteo_weather_drizzle_light" = "小毛毛雨";
+"openmeteo_weather_drizzle_moderate" = "中毛毛雨";
+"openmeteo_weather_drizzle_heavy" = "大毛毛雨";
+"openmeteo_weather_freezing_drizzle_light" = "小冻毛毛雨";
+"openmeteo_weather_freezing_drizzle_heavy" = "强冻毛毛雨";
+"openmeteo_weather_freezing_rain_light" = "小冻雨";
+"openmeteo_weather_freezing_rain_heavy" = "强冻雨";
+"openmeteo_weather_snow_grains" = "雪粒";
+"openmeteo_weather_rain_showers_light" = "小阵雨";
+"openmeteo_weather_rain_showers_moderate" = "中阵雨";
+"openmeteo_weather_rain_showers_heavy" = "强阵雨";
+"openmeteo_weather_snow_showers_light" = "小阵雪";
+"openmeteo_weather_snow_showers_heavy" = "强阵雪";
+"openmeteo_weather_thunderstorm_light_hail" = "雷暴伴小冰雹";
+"openmeteo_weather_thunderstorm_heavy_hail" = "雷暴伴大冰雹";
 
 "dark_mode_auto" = "自动";
 "dark_mode_system" = "跟随系统";

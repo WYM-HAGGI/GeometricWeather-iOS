@@ -202,7 +202,12 @@ class MainViewModel: NSObject {
     }
     
     private func currentLocationIsValid() -> Bool {
-        return currentLocation.value.location.weather?.isValid(
+        let location = currentLocation.value.location
+        if location.currentPosition && !locationHasResolvedAddress(location) {
+            return false
+        }
+        
+        return location.weather?.isValid(
             pollingIntervalHours: SettingsManager.shared.updateInterval.hours
         ) ?? false
     }

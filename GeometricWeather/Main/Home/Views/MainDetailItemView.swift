@@ -44,7 +44,7 @@ class MainDetailItemView: UIView {
         self.addSubview(self.bodyLabel)
         
         self.icon.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(littleMargin)
+            make.top.equalToSuperview().offset(MainCardLayoutMetrics.detailItemVerticalPadding)
             make.leading.equalToSuperview().offset(normalMargin)
             make.size.equalTo(iconSize)
         }
@@ -57,7 +57,7 @@ class MainDetailItemView: UIView {
             make.top.equalTo(self.titleLabel.snp.bottom).offset(2.0)
             make.leading.equalTo(self.titleLabel.snp.leading)
             make.trailing.equalTo(self.titleLabel.snp.trailing)
-            make.bottom.equalToSuperview().offset(-littleMargin)
+            make.bottom.equalToSuperview().offset(-MainCardLayoutMetrics.detailItemVerticalPadding)
         }
     }
     

@@ -85,11 +85,17 @@ class EmptyLocationItemView: UIView {
     }
     
     func bindData(location: Location) {
-        self.titleLabel1.text = location.currentPosition
-        ? getLocalizedText("current_location")
-        : getLocationText(location: location)
+        bindData(
+            location: location,
+            title: nil,
+            subtitle: nil
+        )
+    }
+    
+    func bindData(location: Location, title: String?, subtitle: String?) {
+        self.titleLabel1.text = title ?? getLocationText(location: location)
         self.residientIcon.alpha = location.residentPosition ? 1 : 0
-        self.subtitleLabel.text = location.toString()
+        self.subtitleLabel.text = subtitle ?? location.toString()
         self.sourceLabel.text = "Powered by \(location.weatherSource.url)"
         self.sourceLabel.textColor = UIColor.colorFromRGB(location.weatherSource.color)
     }

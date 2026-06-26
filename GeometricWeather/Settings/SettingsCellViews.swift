@@ -172,6 +172,7 @@ struct SettingsCellViews_Previews: PreviewProvider {
             SettingsListCellView(
                 titleKey: "settings_title_weather_source",
                 keys: [
+                    "weather_source_openmeteo",
                     "weather_source_cn",
                     "weather_source_caiyun",
                     "weather_source_accu",

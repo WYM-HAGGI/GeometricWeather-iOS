@@ -69,7 +69,10 @@ class HourlyAirQualityTrendGenerator: MainTrendGenerator, MainTrendGeneratorProt
             var useAccentColorForDate = indexPath.row == 0
             if weather
                .hourlyForecasts[indexPath.row]
-                .getHour(inTwelveHourFormat: false) == 0 {
+               .getHour(
+                inTwelveHourFormat: false,
+                timezone: self.location.timezone
+               ) == 0 {
                 useAccentColorForDate = true
             }
             
@@ -191,10 +194,11 @@ class HourlyAirQualityCollectionViewCell: MainTrendCollectionViewCell, MainTrend
         timezone: TimeZone,
         useAccentColorForDate: Bool
     ) {
-        self.hourLabel.text = getHourText(hourly)
+        self.hourLabel.text = getHourText(hourly, timezone: timezone)
         
         self.dateLabel.text = hourly.formatDate(
-            format: getLocalizedText("date_format_short")
+            format: getLocalizedText("date_format_short"),
+            timezone: timezone
         )
         self.dateLabel.textColor = useAccentColorForDate
         ? .label

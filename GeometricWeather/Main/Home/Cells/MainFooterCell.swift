@@ -16,6 +16,7 @@ struct MainFooterEditButtonTapAction {}
 
 class MainFooterCell: UITableViewCell, AbstractMainItem {
     
+    private let addressLabel = UILabel(frame: .zero)
     private let titleLabel = UILabel(frame: .zero)
     private let editButton = CornerButton(frame: .zero, useLittleMargin: true)
     
@@ -23,11 +24,22 @@ class MainFooterCell: UITableViewCell, AbstractMainItem {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.backgroundColor = .clear
         
+        self.addressLabel.font = .systemFont(
+            ofSize: miniCaptionFont.pointSize,
+            weight: .medium
+        )
+        self.addressLabel.textColor = MainHomeReadableColors.footerSecondaryTextColor
+        self.addressLabel.textAlignment = .center
+        self.addressLabel.numberOfLines = 2
+        self.addressLabel.lineBreakMode = .byTruncatingTail
+        self.contentView.addSubview(self.addressLabel)
+        
         self.titleLabel.font = .systemFont(
             ofSize: captionFont.pointSize,
             weight: .bold
         )
-        self.titleLabel.textColor = .white
+        self.titleLabel.textColor = MainHomeReadableColors.footerPrimaryTextColor
+        self.titleLabel.textAlignment = .center
         self.contentView.addSubview(self.titleLabel)
         
         self.editButton.titleLabel?.font = .systemFont(
@@ -43,8 +55,14 @@ class MainFooterCell: UITableViewCell, AbstractMainItem {
         )
         self.contentView.addSubview(self.editButton)
 
-        self.titleLabel.snp.makeConstraints { make in
+        self.addressLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()
+            make.leading.greaterThanOrEqualToSuperview().offset(normalMargin)
+            make.trailing.lessThanOrEqualToSuperview().offset(-normalMargin)
+            make.centerX.equalToSuperview()
+        }
+        self.titleLabel.snp.makeConstraints { make in
+            make.top.equalTo(self.addressLabel.snp.bottom).offset(4.0)
             make.centerX.equalToSuperview()
         }
         self.editButton.snp.makeConstraints { make in
@@ -59,6 +77,18 @@ class MainFooterCell: UITableViewCell, AbstractMainItem {
     }
     
     func bindData(location: Location, timeBar: MainTimeBarView?) {
+        self.applyReadableFooterColors()
+        if let detail = getLocationDetailText(location: location), !detail.isEmpty {
+            self.addressLabel.isHidden = false
+            self.addressLabel.text = (
+                location.currentPosition
+                ? getLocalizedText("current_location_prefix")
+                : getLocalizedText("data_location_prefix")
+            ) + detail
+        } else {
+            self.addressLabel.isHidden = true
+            self.addressLabel.text = nil
+        }
         self.titleLabel.text = "Powered by " + location.weatherSource.url
         self.editButton.setTitle(
             getLocalizedText("edit"),
@@ -70,5 +100,15 @@ class MainFooterCell: UITableViewCell, AbstractMainItem {
         self.window?.windowScene?.eventBus.post(
             MainFooterEditButtonTapAction()
         )
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        self.applyReadableFooterColors()
+    }
+
+    private func applyReadableFooterColors() {
+        self.addressLabel.textColor = MainHomeReadableColors.footerSecondaryTextColor
+        self.titleLabel.textColor = MainHomeReadableColors.footerPrimaryTextColor
     }
 }

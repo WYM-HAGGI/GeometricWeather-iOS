@@ -17,6 +17,12 @@ import GeometricWeatherTheme
 class MainTrendShaderCollectionView: UICollectionView {
     
     private let scrollBar = MainTrendScrollBarView(frame: .zero)
+
+    var highlightsLeadingVisibleItem = false {
+        didSet {
+            self.setNeedsLayout()
+        }
+    }
     
     var cellSize: CGSize {
         return CGSize(
@@ -34,15 +40,32 @@ class MainTrendShaderCollectionView: UICollectionView {
     }
     
     var highlightIndex: Int {
+        let itemCount = self.numberOfItems(inSection: 0)
+        guard itemCount > 0 else {
+            return 0
+        }
+        if self.highlightsLeadingVisibleItem {
+            let maxOffsetX = max(0.0, self.contentSize.width - self.frame.width)
+            guard maxOffsetX > 0 else {
+                return self.isRtl ? itemCount - 1 : 0
+            }
+            let progress = min(1.0, max(0.0, self.contentOffset.x / maxOffsetX))
+            let rtlProgress = self.isRtl ? (1.0 - progress) : progress
+            return min(
+                itemCount - 1,
+                max(0, Int(round(rtlProgress * CGFloat(itemCount - 1))))
+            )
+        }
         let rtlCenterX = self.isRtl
         ? (self.contentSize.width - self.scrollBar.center.x)
         : self.scrollBar.center.x
         // center positon / step-width, then cut the above value as int value.
-        return Int(
+        let index = Int(
             rtlCenterX / (
-                self.contentSize.width / Double(self.numberOfItems(inSection: 0))
+                self.contentSize.width / Double(itemCount)
             )
         )
+        return min(itemCount - 1, max(0, index))
     }
     
     // MARK: - life cycle.
@@ -69,10 +92,17 @@ class MainTrendShaderCollectionView: UICollectionView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
+        let maxOffsetX = max(0.0, self.contentSize.width - self.frame.width)
+        let x: CGFloat
+        if maxOffsetX == 0.0 {
+            x = self.contentOffset.x
+        } else {
+            x = (self.frame.width - self.cellSize.width)
+                * self.contentOffset.x / maxOffsetX
+                + self.contentOffset.x
+        }
         self.scrollBar.frame = CGRect(
-            x: (self.frame.width - self.cellSize.width)
-            * self.contentOffset.x / (self.contentSize.width - self.frame.width)
-            + self.contentOffset.x,
+            x: x,
             y: 0.0,
             width: self.cellSize.width,
             height: self.frame.height
@@ -123,6 +153,7 @@ fileprivate class MainTrendScrollBarView: UICollectionReusableView {
         self.foregroundLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
         self.foregroundLayer.endPoint = CGPoint(x: 0.5, y: 1.0)
         self.layer.addSublayer(self.foregroundLayer)
+        self.setScrollBarColors()
     }
     
     required init?(coder: NSCoder) {
@@ -130,6 +161,8 @@ fileprivate class MainTrendScrollBarView: UICollectionReusableView {
     }
     
     override func layoutSubviews() {
+        super.layoutSubviews()
+        self.setScrollBarColors()
         self.foregroundLayer.frame = CGRect(
             x: 0.0,
             y: 0.0,
@@ -147,11 +180,12 @@ fileprivate class MainTrendScrollBarView: UICollectionReusableView {
     }
     
     private func setScrollBarColors() {
+        let foregroundColor = self.traitCollection.userInterfaceStyle == .light
+            ? UIColor.black.withAlphaComponent(0.07)
+            : UIColor.white.withAlphaComponent(0.18)
         self.foregroundLayer.colors = [
             UIColor.clear.cgColor,
-            self.traitCollection.userInterfaceStyle == .light
-            ? UIColor.black.withAlphaComponent(0.04).cgColor
-            : UIColor.white.withAlphaComponent(0.04).cgColor,
+            foregroundColor.cgColor,
             UIColor.clear.cgColor,
         ]
     }

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 55;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -42,6 +42,12 @@
 		37595123297435DD002F6B22 /* GeometricWeatherLiveActivityExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 37595114297435DC002F6B22 /* GeometricWeatherLiveActivityExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3759512929743681002F6B22 /* GeometricWeatherBasic in Frameworks */ = {isa = PBXBuildFile; productRef = 3759512829743681002F6B22 /* GeometricWeatherBasic */; };
 		3759512B2977D9AC002F6B22 /* LiveActivityHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759512A2977D9AC002F6B22 /* LiveActivityHelper.swift */; };
+		3759513B2977F001002F6B22 /* LiveActivityWeatherEligibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759513A2977F001002F6B22 /* LiveActivityWeatherEligibility.swift */; };
+		3759513B2977F001002F6B00 /* WeatherEventThresholds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759513A2977F001002F6B00 /* WeatherEventThresholds.swift */; };
+		3759513B2977F001002F6B01 /* HourlyWeatherNoticeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759513A2977F001002F6B01 /* HourlyWeatherNoticeBuilder.swift */; };
+		3759513D2977F002002F6B22 /* WeatherAlertProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759513C2977F002002F6B22 /* WeatherAlertProvider.swift */; };
+		3759513F2977F003002F6B22 /* AirQualityProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759513E2977F003002F6B22 /* AirQualityProvider.swift */; };
+		375951412977F004002F6B22 /* DeviceBarometerProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375951402977F004002F6B22 /* DeviceBarometerProvider.swift */; };
 		3759512F2977E84B002F6B22 /* PrecipitationActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759512D2977E670002F6B22 /* PrecipitationActivityWidget.swift */; };
 		375951332977E988002F6B22 /* PrecipitationActivityNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375951322977E988002F6B22 /* PrecipitationActivityNotificationView.swift */; };
 		375951362977ECA9002F6B22 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375951352977ECA9002F6B22 /* Constants.swift */; };
@@ -87,11 +93,13 @@
 		379A8B3027C8C59000083BFF /* MainAllergenCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A6A27C8C59000083BFF /* MainAllergenCardCell.swift */; };
 		379A8B3127C8C59000083BFF /* MainDailyCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A6B27C8C59000083BFF /* MainDailyCardCell.swift */; };
 		379A8B3227C8C59000083BFF /* MainTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A6C27C8C59000083BFF /* MainTableViewCell.swift */; };
+		379A8B3327C8C59000083B00 /* MainCardLayoutMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A6C27C8C59000083B00 /* MainCardLayoutMetrics.swift */; };
 		379A8B3327C8C59000083BFF /* HomeViewController+Events.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A6D27C8C59000083BFF /* HomeViewController+Events.swift */; };
 		379A8B3427C8C59000083BFF /* HomeViewController+UITableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A6E27C8C59000083BFF /* HomeViewController+UITableView.swift */; };
 		379A8B3527C8C59000083BFF /* HomeViewController+Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A6F27C8C59000083BFF /* HomeViewController+Layout.swift */; };
 		379A8B3627C8C59000083BFF /* HomeViewController+PageIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A7027C8C59000083BFF /* HomeViewController+PageIndicator.swift */; };
 		379A8B3727C8C59000083BFF /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A7127C8C59000083BFF /* HomeViewController.swift */; };
+		379A8B3727C8C59000083B00 /* MainHomeLayoutMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A7127C8C59000083B00 /* MainHomeLayoutMetrics.swift */; };
 		379A8B3827C8C59000083BFF /* MainDetailItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A7327C8C59000083BFF /* MainDetailItemView.swift */; };
 		379A8B3927C8C59000083BFF /* MainSelectableTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A7427C8C59000083BFF /* MainSelectableTagView.swift */; };
 		379A8B3A27C8C59000083BFF /* MainTimeBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379A8A7527C8C59000083BFF /* MainTimeBarView.swift */; };
@@ -283,9 +291,12 @@
 		370BA59E269C398F006BB1CE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		370BA5A0269C398F006BB1CE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		370BA5C2269C5E37006BB1CE /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
-		370BA5C7269C6091006BB1CE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		370BA5C9269C609B006BB1CE /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		3723224F26AA8DB000A11139 /* GeometricWeather.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GeometricWeather.entitlements; sourceTree = "<group>"; };
+			370BA5C7269C6091006BB1CE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+			370BA5C9269C609B006BB1CE /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+			37A200010618A00000000001 /* GeometricWeather.debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = GeometricWeather.debug.xcconfig; sourceTree = "<group>"; };
+			37A200020618A00000000002 /* GeometricWeather.release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = GeometricWeather.release.xcconfig; sourceTree = "<group>"; };
+			37A200030618A00000000003 /* LocalConfig.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = LocalConfig.example.xcconfig; sourceTree = "<group>"; };
+			3723224F26AA8DB000A11139 /* GeometricWeather.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GeometricWeather.entitlements; sourceTree = "<group>"; };
 		373F760327E357720005875B /* MiddleUnitText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiddleUnitText.swift; sourceTree = "<group>"; };
 		373F760527E35B750005875B /* MiddleUnitLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiddleUnitLabel.swift; sourceTree = "<group>"; };
 		373F760827E40C500005875B /* DailyPrecipitationCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyPrecipitationCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -319,6 +330,12 @@
 		37595120297435DD002F6B22 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		37595124297435DD002F6B22 /* GeometricWeatherLiveActivityExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GeometricWeatherLiveActivityExtension.entitlements; sourceTree = "<group>"; };
 		3759512A2977D9AC002F6B22 /* LiveActivityHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityHelper.swift; sourceTree = "<group>"; };
+		3759513A2977F001002F6B22 /* LiveActivityWeatherEligibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityWeatherEligibility.swift; sourceTree = "<group>"; };
+		3759513A2977F001002F6B00 /* WeatherEventThresholds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherEventThresholds.swift; sourceTree = "<group>"; };
+		3759513A2977F001002F6B01 /* HourlyWeatherNoticeBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyWeatherNoticeBuilder.swift; sourceTree = "<group>"; };
+		3759513C2977F002002F6B22 /* WeatherAlertProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAlertProvider.swift; sourceTree = "<group>"; };
+		3759513E2977F003002F6B22 /* AirQualityProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirQualityProvider.swift; sourceTree = "<group>"; };
+		375951402977F004002F6B22 /* DeviceBarometerProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBarometerProvider.swift; sourceTree = "<group>"; };
 		3759512D2977E670002F6B22 /* PrecipitationActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrecipitationActivityWidget.swift; sourceTree = "<group>"; };
 		375951322977E988002F6B22 /* PrecipitationActivityNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrecipitationActivityNotificationView.swift; sourceTree = "<group>"; };
 		375951352977ECA9002F6B22 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -377,12 +394,14 @@
 		379A8A6927C8C59000083BFF /* AllergenCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AllergenCollectionViewCell.swift; sourceTree = "<group>"; };
 		379A8A6A27C8C59000083BFF /* MainAllergenCardCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainAllergenCardCell.swift; sourceTree = "<group>"; };
 		379A8A6B27C8C59000083BFF /* MainDailyCardCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainDailyCardCell.swift; sourceTree = "<group>"; };
+		379A8A6C27C8C59000083B00 /* MainCardLayoutMetrics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainCardLayoutMetrics.swift; sourceTree = "<group>"; };
 		379A8A6C27C8C59000083BFF /* MainTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTableViewCell.swift; sourceTree = "<group>"; };
 		379A8A6D27C8C59000083BFF /* HomeViewController+Events.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "HomeViewController+Events.swift"; sourceTree = "<group>"; };
 		379A8A6E27C8C59000083BFF /* HomeViewController+UITableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "HomeViewController+UITableView.swift"; sourceTree = "<group>"; };
 		379A8A6F27C8C59000083BFF /* HomeViewController+Layout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "HomeViewController+Layout.swift"; sourceTree = "<group>"; };
 		379A8A7027C8C59000083BFF /* HomeViewController+PageIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "HomeViewController+PageIndicator.swift"; sourceTree = "<group>"; };
 		379A8A7127C8C59000083BFF /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		379A8A7127C8C59000083B00 /* MainHomeLayoutMetrics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainHomeLayoutMetrics.swift; sourceTree = "<group>"; };
 		379A8A7327C8C59000083BFF /* MainDetailItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainDetailItemView.swift; sourceTree = "<group>"; };
 		379A8A7427C8C59000083BFF /* MainSelectableTagView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainSelectableTagView.swift; sourceTree = "<group>"; };
 		379A8A7527C8C59000083BFF /* MainTimeBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTimeBarView.swift; sourceTree = "<group>"; };
@@ -587,10 +606,11 @@
 				37C4DF8327D21D4200430086 /* Pods */,
 				374BA60C26FC78E10080B5CA /* GeometricWeatherWidgetExtension.entitlements */,
 				37595124297435DD002F6B22 /* GeometricWeatherLiveActivityExtension.entitlements */,
-				37A35F7926F5957B00431565 /* GeometricWeatherBasic */,
-				379A8BD527D1DEB700083BFF /* Podfile */,
-				370BA5C8269C6091006BB1CE /* InfoPlist.strings */,
-				370BA596269C398D006BB1CE /* GeometricWeather */,
+					37A35F7926F5957B00431565 /* GeometricWeatherBasic */,
+					379A8BD527D1DEB700083BFF /* Podfile */,
+					37A200040618A00000000004 /* Config */,
+					370BA5C8269C6091006BB1CE /* InfoPlist.strings */,
+					370BA596269C398D006BB1CE /* GeometricWeather */,
 				374BA60026FC78E00080B5CA /* GeometricWeatherWidget */,
 				37595117297435DC002F6B22 /* GeometricWeatherLiveActivity */,
 				376596C7281FA50A00164CAD /* GeometricWeatherWatch */,
@@ -598,10 +618,20 @@
 				37A35F6126F4B45300431565 /* Frameworks */,
 				370BA595269C398D006BB1CE /* Products */,
 				F813B36BFD806899701C0E6D /* Pods */,
-			);
-			sourceTree = "<group>";
-		};
-		370BA595269C398D006BB1CE /* Products */ = {
+				);
+				sourceTree = "<group>";
+			};
+			37A200040618A00000000004 /* Config */ = {
+				isa = PBXGroup;
+				children = (
+					37A200010618A00000000001 /* GeometricWeather.debug.xcconfig */,
+					37A200020618A00000000002 /* GeometricWeather.release.xcconfig */,
+					37A200030618A00000000003 /* LocalConfig.example.xcconfig */,
+				);
+				path = Config;
+				sourceTree = "<group>";
+			};
+			370BA595269C398D006BB1CE /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				370BA594269C398D006BB1CE /* GeometricWeather.app */,
@@ -859,6 +889,7 @@
 				379A8A7227C8C59000083BFF /* Views */,
 				37462A0E2823A13E009FBB85 /* Controllers */,
 				379A8A5927C8C59000083BFF /* Cells */,
+				379A8A7127C8C59000083B00 /* MainHomeLayoutMetrics.swift */,
 				379A8A7127C8C59000083BFF /* HomeViewController.swift */,
 				379A8A6F27C8C59000083BFF /* HomeViewController+Layout.swift */,
 				379A8A6E27C8C59000083BFF /* HomeViewController+UITableView.swift */,
@@ -874,6 +905,7 @@
 			children = (
 				379A8A5C27C8C59000083BFF /* Trend */,
 				379A8A7827C8C59000083BFF /* MainTableViewHeaderView.swift */,
+				379A8A6C27C8C59000083B00 /* MainCardLayoutMetrics.swift */,
 				379A8A6C27C8C59000083BFF /* MainTableViewCell.swift */,
 				379A8A6B27C8C59000083BFF /* MainDailyCardCell.swift */,
 				379A8A5A27C8C59000083BFF /* MainHourlyCardCell.swift */,
@@ -1060,6 +1092,12 @@
 				379A8ABB27C8C59000083BFF /* AppNotificationHelper.swift */,
 				379A8ABC27C8C59000083BFF /* AppExtensionHelper.swift */,
 				3759512A2977D9AC002F6B22 /* LiveActivityHelper.swift */,
+				3759513A2977F001002F6B22 /* LiveActivityWeatherEligibility.swift */,
+				3759513A2977F001002F6B00 /* WeatherEventThresholds.swift */,
+				3759513A2977F001002F6B01 /* HourlyWeatherNoticeBuilder.swift */,
+				3759513C2977F002002F6B22 /* WeatherAlertProvider.swift */,
+				3759513E2977F003002F6B22 /* AirQualityProvider.swift */,
+				375951402977F004002F6B22 /* DeviceBarometerProvider.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -1139,15 +1177,15 @@
 		37C4DFBB27D21D4200430086 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3771D83F28226F4500AEB8C1 /* Alamofire */,
-				37C6AE3B27D5F3FB00E88738 /* JXMovableCellTableView */,
-				3771D84128226F4500AEB8C1 /* Moya */,
-				37D3B8B727D6D61700191C2A /* NeedleFoundation */,
-				37C4E16A27D21D4200430086 /* Pods-GeometricWeather */,
-				3771D84328226F4500AEB8C1 /* ReactiveSwift */,
-				3771D84528226F4500AEB8C1 /* RxSwift */,
-				37C4E17227D21D4200430086 /* SnapKit */,
-				37C4E17427D21D4200430086 /* UICountingLabel */,
+				3771D83F28226F4500AEB8C1 /* Alamofire.framework */,
+				37C6AE3B27D5F3FB00E88738 /* JXMovableCellTableView.framework */,
+				3771D84128226F4500AEB8C1 /* Moya.framework */,
+				37D3B8B727D6D61700191C2A /* NeedleFoundation.framework */,
+				37C4E16A27D21D4200430086 /* Pods_GeometricWeather.framework */,
+				3771D84328226F4500AEB8C1 /* ReactiveSwift.framework */,
+				3771D84528226F4500AEB8C1 /* RxSwift.framework */,
+				37C4E17227D21D4200430086 /* SnapKit.framework */,
+				37C4E17427D21D4200430086 /* UICountingLabel.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1467,6 +1505,9 @@
 				Base,
 			);
 			mainGroup = 370BA58B269C398D006BB1CE;
+			packageReferences = (
+				37F2A0002C20B00100F1A001 /* XCLocalSwiftPackageReference "GeometricWeatherBasic" */,
+			);
 			productRefGroup = 370BA595269C398D006BB1CE /* Products */;
 			projectDirPath = "";
 			projectReferences = (
@@ -1485,74 +1526,65 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		3771D83F28226F4500AEB8C1 /* Alamofire */ = {
+		3771D83F28226F4500AEB8C1 /* Alamofire.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = Alamofire;
 			path = Alamofire.framework;
 			remoteRef = 3771D83E28226F4500AEB8C1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3771D84128226F4500AEB8C1 /* Moya */ = {
+		3771D84128226F4500AEB8C1 /* Moya.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = Moya;
 			path = Moya.framework;
 			remoteRef = 3771D84028226F4500AEB8C1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3771D84328226F4500AEB8C1 /* ReactiveSwift */ = {
+		3771D84328226F4500AEB8C1 /* ReactiveSwift.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = ReactiveSwift;
 			path = ReactiveSwift.framework;
 			remoteRef = 3771D84228226F4500AEB8C1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3771D84528226F4500AEB8C1 /* RxSwift */ = {
+		3771D84528226F4500AEB8C1 /* RxSwift.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = RxSwift;
 			path = RxSwift.framework;
 			remoteRef = 3771D84428226F4500AEB8C1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		37C4E16A27D21D4200430086 /* Pods-GeometricWeather */ = {
+		37C4E16A27D21D4200430086 /* Pods_GeometricWeather.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = "Pods-GeometricWeather";
 			path = Pods_GeometricWeather.framework;
 			remoteRef = 37C4E16927D21D4200430086 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		37C4E17227D21D4200430086 /* SnapKit */ = {
+		37C4E17227D21D4200430086 /* SnapKit.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = SnapKit;
 			path = SnapKit.framework;
 			remoteRef = 37C4E17127D21D4200430086 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		37C4E17427D21D4200430086 /* UICountingLabel */ = {
+		37C4E17427D21D4200430086 /* UICountingLabel.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = UICountingLabel;
 			path = UICountingLabel.framework;
 			remoteRef = 37C4E17327D21D4200430086 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		37C6AE3B27D5F3FB00E88738 /* JXMovableCellTableView */ = {
+		37C6AE3B27D5F3FB00E88738 /* JXMovableCellTableView.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = JXMovableCellTableView;
 			path = JXMovableCellTableView.framework;
 			remoteRef = 37C6AE3A27D5F3FB00E88738 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		37D3B8B727D6D61700191C2A /* NeedleFoundation */ = {
+		37D3B8B727D6D61700191C2A /* NeedleFoundation.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			name = NeedleFoundation;
 			path = NeedleFoundation.framework;
 			remoteRef = 37D3B8B627D6D61700191C2A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -1605,7 +1637,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export SOURCEKIT_LOGGING=0 && needle generate $SRCROOT/$TARGETNAME/NeedleGenerated.swift $SRCROOT/$TARGETNAME\n";
+			shellScript = "export SOURCEKIT_LOGGING=0\nif command -v needle >/dev/null 2>&1; then\n  needle generate \"$SRCROOT/$TARGETNAME/NeedleGenerated.swift\" \"$SRCROOT/$TARGETNAME\"\nelse\n  echo \"warning: needle CLI not found; using checked-in NeedleGenerated.swift\"\nfi\n";
 		};
 		3B7D60976E16AA5E2EAC2EC2 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1615,9 +1647,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GeometricWeather/Pods-GeometricWeather-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GeometricWeather/Pods-GeometricWeather-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1703,8 +1739,10 @@
 				379A8B6C27C8C59100083BFF /* AppNotificationHelper.swift in Sources */,
 				379A8B4827C8C59000083BFF /* DailyViewController.swift in Sources */,
 				379A8BBE27C8C59100083BFF /* SettingsView.swift in Sources */,
+				379A8B3327C8C59000083B00 /* MainCardLayoutMetrics.swift in Sources */,
 				379A8B3E27C8C59000083BFF /* MainViewController.swift in Sources */,
 				379A8B3227C8C59000083BFF /* MainTableViewCell.swift in Sources */,
+				379A8B3727C8C59000083B00 /* MainHomeLayoutMetrics.swift in Sources */,
 				379A8B3727C8C59000083BFF /* HomeViewController.swift in Sources */,
 				379A8B3527C8C59000083BFF /* HomeViewController+Layout.swift in Sources */,
 				374629F52823996B009FBB85 /* UILabelExt.swift in Sources */,
@@ -1775,6 +1813,12 @@
 				3793419C2813D8780046AD88 /* MainTrendCollectionViewCell.swift in Sources */,
 				374629FF28239985009FBB85 /* CGRectExt.swift in Sources */,
 				3759512B2977D9AC002F6B22 /* LiveActivityHelper.swift in Sources */,
+				3759513B2977F001002F6B22 /* LiveActivityWeatherEligibility.swift in Sources */,
+				3759513B2977F001002F6B00 /* WeatherEventThresholds.swift in Sources */,
+				3759513B2977F001002F6B01 /* HourlyWeatherNoticeBuilder.swift in Sources */,
+				3759513D2977F002002F6B22 /* WeatherAlertProvider.swift in Sources */,
+				3759513F2977F003002F6B22 /* AirQualityProvider.swift in Sources */,
+				375951412977F004002F6B22 /* DeviceBarometerProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1970,9 +2014,9 @@
 			};
 			name = Release;
 		};
-		370BA5BA269C3990006BB1CE /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 79E1492BD7AC678FF151E4BD /* Pods-GeometricWeather.debug.xcconfig */;
+			370BA5BA269C3990006BB1CE /* Debug */ = {
+				isa = XCBuildConfiguration;
+				baseConfigurationReference = 37A200010618A00000000001 /* GeometricWeather.debug.xcconfig */;
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = NO;
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
@@ -1986,17 +2030,16 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
 				DEVELOPMENT_ASSET_PATHS = "\"GeometricWeather/Preview Content\"";
-				DEVELOPMENT_TEAM = 73CBTMT92C;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = GeometricWeather/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.2;
 				MARKETING_VERSION = 1.7.89;
-				PRODUCT_BUNDLE_IDENTIFIER = wangdaye.com.GeometricWeather;
+				PRODUCT_BUNDLE_IDENTIFIER = com.haggi.geometricweather.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
@@ -2010,9 +2053,9 @@
 			};
 			name = Debug;
 		};
-		370BA5BB269C3990006BB1CE /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = B12EC51E7E25FF4A276860CC /* Pods-GeometricWeather.release.xcconfig */;
+			370BA5BB269C3990006BB1CE /* Release */ = {
+				isa = XCBuildConfiguration;
+				baseConfigurationReference = 37A200020618A00000000002 /* GeometricWeather.release.xcconfig */;
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = NO;
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
@@ -2026,17 +2069,16 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
 				DEVELOPMENT_ASSET_PATHS = "\"GeometricWeather/Preview Content\"";
-				DEVELOPMENT_TEAM = 73CBTMT92C;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = GeometricWeather/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.2;
 				MARKETING_VERSION = 1.7.89;
-				PRODUCT_BUNDLE_IDENTIFIER = wangdaye.com.GeometricWeather;
+				PRODUCT_BUNDLE_IDENTIFIER = com.haggi.geometricweather.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
@@ -2060,19 +2102,18 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = 73CBTMT92C;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherWidgets;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.7.89;
-				PRODUCT_BUNDLE_IDENTIFIER = wangdaye.com.GeometricWeather.GeometricWeatherWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.haggi.geometricweather.test.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = YES;
@@ -2091,19 +2132,18 @@
 				CODE_SIGN_ENTITLEMENTS = GeometricWeatherWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = 73CBTMT92C;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherWidgets;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.7.89;
-				PRODUCT_BUNDLE_IDENTIFIER = wangdaye.com.GeometricWeather.GeometricWeatherWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.haggi.geometricweather.test.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = YES;
@@ -2124,7 +2164,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = 73CBTMT92C;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherLiveActivity/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherLiveActivity;
@@ -2136,7 +2175,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.7.89;
-				PRODUCT_BUNDLE_IDENTIFIER = wangdaye.com.GeometricWeather.GeometricWeatherLiveActivity;
+				PRODUCT_BUNDLE_IDENTIFIER = com.haggi.geometricweather.test.liveactivity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = YES;
@@ -2157,7 +2196,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = 73CBTMT92C;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherLiveActivity/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherLiveActivity;
@@ -2169,7 +2207,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.7.89;
-				PRODUCT_BUNDLE_IDENTIFIER = wangdaye.com.GeometricWeather.GeometricWeatherLiveActivity;
+				PRODUCT_BUNDLE_IDENTIFIER = com.haggi.geometricweather.test.liveactivity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = YES;
@@ -2220,17 +2258,27 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		37F2A0002C20B00100F1A001 /* XCLocalSwiftPackageReference "GeometricWeatherBasic" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = GeometricWeatherBasic;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		3759512829743681002F6B22 /* GeometricWeatherBasic */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 37F2A0002C20B00100F1A001 /* XCLocalSwiftPackageReference "GeometricWeatherBasic" */;
 			productName = GeometricWeatherBasic;
 		};
 		3771D8792822A28400AEB8C1 /* GeometricWeatherBasic */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 37F2A0002C20B00100F1A001 /* XCLocalSwiftPackageReference "GeometricWeatherBasic" */;
 			productName = GeometricWeatherBasic;
 		};
 		3771D87B2822A29000AEB8C1 /* GeometricWeatherBasic */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 37F2A0002C20B00100F1A001 /* XCLocalSwiftPackageReference "GeometricWeatherBasic" */;
 			productName = GeometricWeatherBasic;
 		};
 /* End XCSwiftPackageProductDependency section */

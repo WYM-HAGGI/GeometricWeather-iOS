@@ -50,7 +50,9 @@ struct HourlySection: View {
             DetailsWeatherHeaderView(
                 weatherCode: self.weather.hourlyForecasts[index].weatherCode,
                 daylight: self.weather.hourlyForecasts[index].daylight,
-                weatherText: self.weather.hourlyForecasts[index].weatherText,
+                weatherText: getDisplayWeatherText(
+                    self.weather.hourlyForecasts[index].weatherText
+                ),
                 temperature: self.weather.hourlyForecasts[index].temperature
             )
             

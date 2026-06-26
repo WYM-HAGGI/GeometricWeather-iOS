@@ -56,7 +56,9 @@ struct CurrentSquareView: View {
         
         self.currentWeatherCode = location.weather?.current.weatherCode ?? .clear
         self.currentDaylight = location.isDaylight
-        self.currentWeatherText = location.weather?.current.weatherText ?? ""
+        self.currentWeatherText = getDisplayWeatherText(
+            location.weather?.current.weatherText ?? ""
+        )
     }
     
     var body: some View {
@@ -136,4 +138,3 @@ struct CurrentSquareView_Previews: PreviewProvider {
         )
     }
 }
-

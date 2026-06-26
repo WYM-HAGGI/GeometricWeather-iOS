@@ -2030,7 +2030,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
 				DEVELOPMENT_ASSET_PATHS = "\"GeometricWeather/Preview Content\"";
-				DEVELOPMENT_TEAM = 39G3694334;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = GeometricWeather/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -2070,7 +2069,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
 				DEVELOPMENT_ASSET_PATHS = "\"GeometricWeather/Preview Content\"";
-				DEVELOPMENT_TEAM = 39G3694334;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = GeometricWeather/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -2104,7 +2102,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = 39G3694334;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherWidgets;
@@ -2135,7 +2132,6 @@
 				CODE_SIGN_ENTITLEMENTS = GeometricWeatherWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = 39G3694334;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherWidgets;
@@ -2168,7 +2164,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = 39G3694334;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherLiveActivity/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherLiveActivity;
@@ -2201,7 +2196,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1789;
-				DEVELOPMENT_TEAM = 39G3694334;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GeometricWeatherLiveActivity/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GeometricWeatherLiveActivity;

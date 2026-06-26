@@ -13,8 +13,10 @@ xcuserdata/
 
 ## compatibility with Xcode 3 and earlier (ignoring not required starting Xcode 4)
 build/
+Build/
 DerivedData/
 .derivedData/
+.derivedData-*/
 *.moved-aside
 *.pbxuser
 !default.pbxuser
@@ -72,4 +74,17 @@ iOSInjectionProject/
 
 # Local API keys. Keep real service keys out of git.
 Config/LocalConfig.xcconfig
-{"mode":"full","isActive":false}
+*.local.xcconfig
+.env
+.env.*
+
+# SwiftPM
+.swiftpm/
+
+# CocoaPods generated local metadata
+Pods/Pods.xcodeproj/xcuserdata/
+Pods/Pods.xcodeproj/xcshareddata/
+
+# Xcode local state
+*.xcuserstate
+*.xcuserdata/
